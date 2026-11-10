@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -18,9 +20,23 @@ class PlayerController {
   late final VideoController video;
   final PlayQueue queue = PlayQueue();
 
-  Future<void> open(String path) async {
+  final _opened = StreamController<String>.broadcast();
+
+  /// Emits the path every time a new file starts (open, next, previous).
+  Stream<String> get opened => _opened.stream;
+
+  Future<void> open(String path, {Duration? start}) async {
     queue.select(path);
-    await player.open(Media(path));
+    _opened.add(path);
+    await player.open(Media(path, start: start));
+  }
+
+  /// Queues [paths] in order and starts at [startPath].
+  Future<void> playList(List<String> paths, String startPath,
+      {Duration? start}) async {
+    queue.setItems(paths, start: paths.indexOf(startPath));
+    _opened.add(startPath);
+    await player.open(Media(startPath, start: start));
   }
 
   Future<void> play() => player.play();
@@ -45,12 +61,18 @@ class PlayerController {
 
   Future<void> next() async {
     final p = queue.next();
-    if (p != null) await player.open(Media(p));
+    if (p != null) {
+      _opened.add(p);
+      await player.open(Media(p));
+    }
   }
 
   Future<void> previous() async {
     final p = queue.previous();
-    if (p != null) await player.open(Media(p));
+    if (p != null) {
+      _opened.add(p);
+      await player.open(Media(p));
+    }
   }
 
   Future<void> setAudioTrack(AudioTrack track) => player.setAudioTrack(track);
