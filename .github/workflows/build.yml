@@ -52,3 +52,23 @@ jobs:
         with:
           name: marquee-windows
           path: Marquee-windows.zip
+
+  ao-pcm-spike:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Prove ao=pcm exists in bundled libmpv (macOS)
+        if: runner.os == 'macOS'
+        run: flutter test integration_test/ao_pcm_test.dart -d macos
+      - name: Prove ao=pcm exists in bundled libmpv (Windows)
+        if: runner.os == 'Windows'
+        run: flutter test integration_test/ao_pcm_test.dart -d windows
