@@ -1203,14 +1203,1218 @@ class VideosCompanion extends UpdateCompanion<Video> {
   }
 }
 
+class $PlaylistsTable extends Playlists
+    with TableInfo<$PlaylistsTable, Playlist> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaylistsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, createdAt, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'playlists';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Playlist> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Playlist map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Playlist(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaylistsTable createAlias(String alias) {
+    return $PlaylistsTable(attachedDatabase, alias);
+  }
+}
+
+class Playlist extends DataClass implements Insertable<Playlist> {
+  final int id;
+  final String name;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Playlist({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PlaylistsCompanion toCompanion(bool nullToAbsent) {
+    return PlaylistsCompanion(
+      id: Value(id),
+      name: Value(name),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Playlist.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Playlist(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Playlist copyWith({
+    int? id,
+    String? name,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Playlist(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Playlist copyWithCompanion(PlaylistsCompanion data) {
+    return Playlist(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Playlist(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Playlist &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PlaylistsCompanion extends UpdateCompanion<Playlist> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const PlaylistsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  PlaylistsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : name = Value(name),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<Playlist> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  PlaylistsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return PlaylistsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaylistsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlaylistItemsTable extends PlaylistItems
+    with TableInfo<$PlaylistItemsTable, PlaylistItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaylistItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _playlistIdMeta = const VerificationMeta(
+    'playlistId',
+  );
+  @override
+  late final GeneratedColumn<int> playlistId = GeneratedColumn<int>(
+    'playlist_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES playlists (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _videoIdMeta = const VerificationMeta(
+    'videoId',
+  );
+  @override
+  late final GeneratedColumn<int> videoId = GeneratedColumn<int>(
+    'video_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES videos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, playlistId, videoId, position];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'playlist_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlaylistItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('playlist_id')) {
+      context.handle(
+        _playlistIdMeta,
+        playlistId.isAcceptableOrUnknown(data['playlist_id']!, _playlistIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playlistIdMeta);
+    }
+    if (data.containsKey('video_id')) {
+      context.handle(
+        _videoIdMeta,
+        videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlaylistItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlaylistItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      playlistId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}playlist_id'],
+      )!,
+      videoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}video_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaylistItemsTable createAlias(String alias) {
+    return $PlaylistItemsTable(attachedDatabase, alias);
+  }
+}
+
+class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
+  final int id;
+  final int playlistId;
+  final int videoId;
+  final int position;
+  const PlaylistItem({
+    required this.id,
+    required this.playlistId,
+    required this.videoId,
+    required this.position,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['playlist_id'] = Variable<int>(playlistId);
+    map['video_id'] = Variable<int>(videoId);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  PlaylistItemsCompanion toCompanion(bool nullToAbsent) {
+    return PlaylistItemsCompanion(
+      id: Value(id),
+      playlistId: Value(playlistId),
+      videoId: Value(videoId),
+      position: Value(position),
+    );
+  }
+
+  factory PlaylistItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlaylistItem(
+      id: serializer.fromJson<int>(json['id']),
+      playlistId: serializer.fromJson<int>(json['playlistId']),
+      videoId: serializer.fromJson<int>(json['videoId']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'playlistId': serializer.toJson<int>(playlistId),
+      'videoId': serializer.toJson<int>(videoId),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  PlaylistItem copyWith({
+    int? id,
+    int? playlistId,
+    int? videoId,
+    int? position,
+  }) => PlaylistItem(
+    id: id ?? this.id,
+    playlistId: playlistId ?? this.playlistId,
+    videoId: videoId ?? this.videoId,
+    position: position ?? this.position,
+  );
+  PlaylistItem copyWithCompanion(PlaylistItemsCompanion data) {
+    return PlaylistItem(
+      id: data.id.present ? data.id.value : this.id,
+      playlistId: data.playlistId.present
+          ? data.playlistId.value
+          : this.playlistId,
+      videoId: data.videoId.present ? data.videoId.value : this.videoId,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaylistItem(')
+          ..write('id: $id, ')
+          ..write('playlistId: $playlistId, ')
+          ..write('videoId: $videoId, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, playlistId, videoId, position);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlaylistItem &&
+          other.id == this.id &&
+          other.playlistId == this.playlistId &&
+          other.videoId == this.videoId &&
+          other.position == this.position);
+}
+
+class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
+  final Value<int> id;
+  final Value<int> playlistId;
+  final Value<int> videoId;
+  final Value<int> position;
+  const PlaylistItemsCompanion({
+    this.id = const Value.absent(),
+    this.playlistId = const Value.absent(),
+    this.videoId = const Value.absent(),
+    this.position = const Value.absent(),
+  });
+  PlaylistItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int playlistId,
+    required int videoId,
+    required int position,
+  }) : playlistId = Value(playlistId),
+       videoId = Value(videoId),
+       position = Value(position);
+  static Insertable<PlaylistItem> custom({
+    Expression<int>? id,
+    Expression<int>? playlistId,
+    Expression<int>? videoId,
+    Expression<int>? position,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (playlistId != null) 'playlist_id': playlistId,
+      if (videoId != null) 'video_id': videoId,
+      if (position != null) 'position': position,
+    });
+  }
+
+  PlaylistItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? playlistId,
+    Value<int>? videoId,
+    Value<int>? position,
+  }) {
+    return PlaylistItemsCompanion(
+      id: id ?? this.id,
+      playlistId: playlistId ?? this.playlistId,
+      videoId: videoId ?? this.videoId,
+      position: position ?? this.position,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (playlistId.present) {
+      map['playlist_id'] = Variable<int>(playlistId.value);
+    }
+    if (videoId.present) {
+      map['video_id'] = Variable<int>(videoId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaylistItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('playlistId: $playlistId, ')
+          ..write('videoId: $videoId, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CollectionsTable extends Collections
+    with TableInfo<$CollectionsTable, Collection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CollectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE COLLATE NOCASE',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _coverVideoIdMeta = const VerificationMeta(
+    'coverVideoId',
+  );
+  @override
+  late final GeneratedColumn<int> coverVideoId = GeneratedColumn<int>(
+    'cover_video_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES videos (id) ON DELETE SET NULL',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, createdAt, coverVideoId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'collections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Collection> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('cover_video_id')) {
+      context.handle(
+        _coverVideoIdMeta,
+        coverVideoId.isAcceptableOrUnknown(
+          data['cover_video_id']!,
+          _coverVideoIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Collection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Collection(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      coverVideoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cover_video_id'],
+      ),
+    );
+  }
+
+  @override
+  $CollectionsTable createAlias(String alias) {
+    return $CollectionsTable(attachedDatabase, alias);
+  }
+}
+
+class Collection extends DataClass implements Insertable<Collection> {
+  final int id;
+  final String name;
+  final DateTime createdAt;
+  final int? coverVideoId;
+  const Collection({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+    this.coverVideoId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || coverVideoId != null) {
+      map['cover_video_id'] = Variable<int>(coverVideoId);
+    }
+    return map;
+  }
+
+  CollectionsCompanion toCompanion(bool nullToAbsent) {
+    return CollectionsCompanion(
+      id: Value(id),
+      name: Value(name),
+      createdAt: Value(createdAt),
+      coverVideoId: coverVideoId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverVideoId),
+    );
+  }
+
+  factory Collection.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Collection(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      coverVideoId: serializer.fromJson<int?>(json['coverVideoId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'coverVideoId': serializer.toJson<int?>(coverVideoId),
+    };
+  }
+
+  Collection copyWith({
+    int? id,
+    String? name,
+    DateTime? createdAt,
+    Value<int?> coverVideoId = const Value.absent(),
+  }) => Collection(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    createdAt: createdAt ?? this.createdAt,
+    coverVideoId: coverVideoId.present ? coverVideoId.value : this.coverVideoId,
+  );
+  Collection copyWithCompanion(CollectionsCompanion data) {
+    return Collection(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      coverVideoId: data.coverVideoId.present
+          ? data.coverVideoId.value
+          : this.coverVideoId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Collection(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('coverVideoId: $coverVideoId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, createdAt, coverVideoId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Collection &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt &&
+          other.coverVideoId == this.coverVideoId);
+}
+
+class CollectionsCompanion extends UpdateCompanion<Collection> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  final Value<int?> coverVideoId;
+  const CollectionsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.coverVideoId = const Value.absent(),
+  });
+  CollectionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required DateTime createdAt,
+    this.coverVideoId = const Value.absent(),
+  }) : name = Value(name),
+       createdAt = Value(createdAt);
+  static Insertable<Collection> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+    Expression<int>? coverVideoId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+      if (coverVideoId != null) 'cover_video_id': coverVideoId,
+    });
+  }
+
+  CollectionsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+    Value<int?>? coverVideoId,
+  }) {
+    return CollectionsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      coverVideoId: coverVideoId ?? this.coverVideoId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (coverVideoId.present) {
+      map['cover_video_id'] = Variable<int>(coverVideoId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CollectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('coverVideoId: $coverVideoId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CollectionVideosTable extends CollectionVideos
+    with TableInfo<$CollectionVideosTable, CollectionVideo> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CollectionVideosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _collectionIdMeta = const VerificationMeta(
+    'collectionId',
+  );
+  @override
+  late final GeneratedColumn<int> collectionId = GeneratedColumn<int>(
+    'collection_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES collections (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _videoIdMeta = const VerificationMeta(
+    'videoId',
+  );
+  @override
+  late final GeneratedColumn<int> videoId = GeneratedColumn<int>(
+    'video_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES videos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _addedAtMeta = const VerificationMeta(
+    'addedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> addedAt = GeneratedColumn<DateTime>(
+    'added_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [collectionId, videoId, addedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'collection_videos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CollectionVideo> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('collection_id')) {
+      context.handle(
+        _collectionIdMeta,
+        collectionId.isAcceptableOrUnknown(
+          data['collection_id']!,
+          _collectionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionIdMeta);
+    }
+    if (data.containsKey('video_id')) {
+      context.handle(
+        _videoIdMeta,
+        videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('added_at')) {
+      context.handle(
+        _addedAtMeta,
+        addedAt.isAcceptableOrUnknown(data['added_at']!, _addedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_addedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {collectionId, videoId};
+  @override
+  CollectionVideo map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CollectionVideo(
+      collectionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}collection_id'],
+      )!,
+      videoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}video_id'],
+      )!,
+      addedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}added_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CollectionVideosTable createAlias(String alias) {
+    return $CollectionVideosTable(attachedDatabase, alias);
+  }
+}
+
+class CollectionVideo extends DataClass implements Insertable<CollectionVideo> {
+  final int collectionId;
+  final int videoId;
+  final DateTime addedAt;
+  const CollectionVideo({
+    required this.collectionId,
+    required this.videoId,
+    required this.addedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['collection_id'] = Variable<int>(collectionId);
+    map['video_id'] = Variable<int>(videoId);
+    map['added_at'] = Variable<DateTime>(addedAt);
+    return map;
+  }
+
+  CollectionVideosCompanion toCompanion(bool nullToAbsent) {
+    return CollectionVideosCompanion(
+      collectionId: Value(collectionId),
+      videoId: Value(videoId),
+      addedAt: Value(addedAt),
+    );
+  }
+
+  factory CollectionVideo.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CollectionVideo(
+      collectionId: serializer.fromJson<int>(json['collectionId']),
+      videoId: serializer.fromJson<int>(json['videoId']),
+      addedAt: serializer.fromJson<DateTime>(json['addedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'collectionId': serializer.toJson<int>(collectionId),
+      'videoId': serializer.toJson<int>(videoId),
+      'addedAt': serializer.toJson<DateTime>(addedAt),
+    };
+  }
+
+  CollectionVideo copyWith({
+    int? collectionId,
+    int? videoId,
+    DateTime? addedAt,
+  }) => CollectionVideo(
+    collectionId: collectionId ?? this.collectionId,
+    videoId: videoId ?? this.videoId,
+    addedAt: addedAt ?? this.addedAt,
+  );
+  CollectionVideo copyWithCompanion(CollectionVideosCompanion data) {
+    return CollectionVideo(
+      collectionId: data.collectionId.present
+          ? data.collectionId.value
+          : this.collectionId,
+      videoId: data.videoId.present ? data.videoId.value : this.videoId,
+      addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CollectionVideo(')
+          ..write('collectionId: $collectionId, ')
+          ..write('videoId: $videoId, ')
+          ..write('addedAt: $addedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(collectionId, videoId, addedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CollectionVideo &&
+          other.collectionId == this.collectionId &&
+          other.videoId == this.videoId &&
+          other.addedAt == this.addedAt);
+}
+
+class CollectionVideosCompanion extends UpdateCompanion<CollectionVideo> {
+  final Value<int> collectionId;
+  final Value<int> videoId;
+  final Value<DateTime> addedAt;
+  final Value<int> rowid;
+  const CollectionVideosCompanion({
+    this.collectionId = const Value.absent(),
+    this.videoId = const Value.absent(),
+    this.addedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CollectionVideosCompanion.insert({
+    required int collectionId,
+    required int videoId,
+    required DateTime addedAt,
+    this.rowid = const Value.absent(),
+  }) : collectionId = Value(collectionId),
+       videoId = Value(videoId),
+       addedAt = Value(addedAt);
+  static Insertable<CollectionVideo> custom({
+    Expression<int>? collectionId,
+    Expression<int>? videoId,
+    Expression<DateTime>? addedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (collectionId != null) 'collection_id': collectionId,
+      if (videoId != null) 'video_id': videoId,
+      if (addedAt != null) 'added_at': addedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CollectionVideosCompanion copyWith({
+    Value<int>? collectionId,
+    Value<int>? videoId,
+    Value<DateTime>? addedAt,
+    Value<int>? rowid,
+  }) {
+    return CollectionVideosCompanion(
+      collectionId: collectionId ?? this.collectionId,
+      videoId: videoId ?? this.videoId,
+      addedAt: addedAt ?? this.addedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (collectionId.present) {
+      map['collection_id'] = Variable<int>(collectionId.value);
+    }
+    if (videoId.present) {
+      map['video_id'] = Variable<int>(videoId.value);
+    }
+    if (addedAt.present) {
+      map['added_at'] = Variable<DateTime>(addedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CollectionVideosCompanion(')
+          ..write('collectionId: $collectionId, ')
+          ..write('videoId: $videoId, ')
+          ..write('addedAt: $addedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $LibraryFoldersTable libraryFolders = $LibraryFoldersTable(this);
   late final $VideosTable videos = $VideosTable(this);
+  late final $PlaylistsTable playlists = $PlaylistsTable(this);
+  late final $PlaylistItemsTable playlistItems = $PlaylistItemsTable(this);
+  late final $CollectionsTable collections = $CollectionsTable(this);
+  late final $CollectionVideosTable collectionVideos = $CollectionVideosTable(
+    this,
+  );
   late final Index videosRecordedAt = Index(
     'videos_recorded_at',
     'CREATE INDEX videos_recorded_at ON videos (recorded_at)',
+  );
+  late final Index playlistItemsPos = Index(
+    'playlist_items_pos',
+    'CREATE INDEX playlist_items_pos ON playlist_items (playlist_id, position)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -1219,7 +2423,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     libraryFolders,
     videos,
+    playlists,
+    playlistItems,
+    collections,
+    collectionVideos,
     videosRecordedAt,
+    playlistItemsPos,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1229,6 +2438,41 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('videos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'playlists',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('playlist_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'videos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('playlist_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'videos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('collections', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'collections',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('collection_videos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'videos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('collection_videos', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -1552,6 +2796,62 @@ final class $$VideosTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$PlaylistItemsTable, List<PlaylistItem>>
+  _playlistItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.playlistItems,
+    aliasName: 'videos__id__playlist_items__video_id',
+  );
+
+  $$PlaylistItemsTableProcessedTableManager get playlistItemsRefs {
+    final manager = $$PlaylistItemsTableTableManager(
+      $_db,
+      $_db.playlistItems,
+    ).filter((f) => f.videoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_playlistItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CollectionsTable, List<Collection>>
+  _collectionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.collections,
+    aliasName: 'videos__id__collections__cover_video_id',
+  );
+
+  $$CollectionsTableProcessedTableManager get collectionsRefs {
+    final manager = $$CollectionsTableTableManager(
+      $_db,
+      $_db.collections,
+    ).filter((f) => f.coverVideoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_collectionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CollectionVideosTable, List<CollectionVideo>>
+  _collectionVideosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.collectionVideos,
+    aliasName: 'videos__id__collection_videos__video_id',
+  );
+
+  $$CollectionVideosTableProcessedTableManager get collectionVideosRefs {
+    final manager = $$CollectionVideosTableTableManager(
+      $_db,
+      $_db.collectionVideos,
+    ).filter((f) => f.videoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _collectionVideosRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VideosTableFilterComposer
@@ -1664,6 +2964,81 @@ class $$VideosTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> playlistItemsRefs(
+    Expression<bool> Function($$PlaylistItemsTableFilterComposer f) f,
+  ) {
+    final $$PlaylistItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.playlistItems,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.playlistItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> collectionsRefs(
+    Expression<bool> Function($$CollectionsTableFilterComposer f) f,
+  ) {
+    final $$CollectionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.coverVideoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableFilterComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> collectionVideosRefs(
+    Expression<bool> Function($$CollectionVideosTableFilterComposer f) f,
+  ) {
+    final $$CollectionVideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collectionVideos,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionVideosTableFilterComposer(
+            $db: $db,
+            $table: $db.collectionVideos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -1871,6 +3246,81 @@ class $$VideosTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> playlistItemsRefs<T extends Object>(
+    Expression<T> Function($$PlaylistItemsTableAnnotationComposer a) f,
+  ) {
+    final $$PlaylistItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.playlistItems,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.playlistItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> collectionsRefs<T extends Object>(
+    Expression<T> Function($$CollectionsTableAnnotationComposer a) f,
+  ) {
+    final $$CollectionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.coverVideoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> collectionVideosRefs<T extends Object>(
+    Expression<T> Function($$CollectionVideosTableAnnotationComposer a) f,
+  ) {
+    final $$CollectionVideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collectionVideos,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionVideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.collectionVideos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VideosTableTableManager
@@ -1886,7 +3336,12 @@ class $$VideosTableTableManager
           $$VideosTableUpdateCompanionBuilder,
           (Video, $$VideosTableReferences),
           Video,
-          PrefetchHooks Function({bool folderId})
+          PrefetchHooks Function({
+            bool folderId,
+            bool playlistItemsRefs,
+            bool collectionsRefs,
+            bool collectionVideosRefs,
+          })
         > {
   $$VideosTableTableManager(_$AppDatabase db, $VideosTable table)
     : super(
@@ -1983,7 +3438,727 @@ class $$VideosTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({folderId = false}) {
+          prefetchHooksCallback:
+              ({
+                folderId = false,
+                playlistItemsRefs = false,
+                collectionsRefs = false,
+                collectionVideosRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (playlistItemsRefs) db.playlistItems,
+                    if (collectionsRefs) db.collections,
+                    if (collectionVideosRefs) db.collectionVideos,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (folderId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.folderId,
+                            referencedTable: $$VideosTableReferences
+                                ._folderIdTable(db),
+                            referencedColumn: $$VideosTableReferences
+                                ._folderIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (playlistItemsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Video,
+                          $VideosTable,
+                          PlaylistItem,
+                          $PlaylistItemsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VideosTableReferences
+                              ._playlistItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VideosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).playlistItemsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'video_id',
+                          typedResults: items,
+                        ),
+                      if (collectionsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Video,
+                          $VideosTable,
+                          Collection,
+                          $CollectionsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VideosTableReferences
+                              ._collectionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VideosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).collectionsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'cover_video_id',
+                          typedResults: items,
+                        ),
+                      if (collectionVideosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Video,
+                          $VideosTable,
+                          CollectionVideo,
+                          $CollectionVideosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VideosTableReferences
+                              ._collectionVideosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VideosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).collectionVideosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'video_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$VideosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VideosTable,
+      Video,
+      $$VideosTableFilterComposer,
+      $$VideosTableOrderingComposer,
+      $$VideosTableAnnotationComposer,
+      $$VideosTableCreateCompanionBuilder,
+      $$VideosTableUpdateCompanionBuilder,
+      (Video, $$VideosTableReferences),
+      Video,
+      PrefetchHooks Function({
+        bool folderId,
+        bool playlistItemsRefs,
+        bool collectionsRefs,
+        bool collectionVideosRefs,
+      })
+    >;
+typedef $$PlaylistsTableCreateCompanionBuilder = PlaylistsCompanion Function({
+  Value<int> id,
+  required String name,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+});
+typedef $$PlaylistsTableUpdateCompanionBuilder = PlaylistsCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+});
+
+final class $$PlaylistsTableReferences
+    extends BaseReferences<_$AppDatabase, $PlaylistsTable, Playlist> {
+  $$PlaylistsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PlaylistItemsTable, List<PlaylistItem>>
+  _playlistItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.playlistItems,
+    aliasName: 'playlists__id__playlist_items__playlist_id',
+  );
+
+  $$PlaylistItemsTableProcessedTableManager get playlistItemsRefs {
+    final manager = $$PlaylistItemsTableTableManager(
+      $_db,
+      $_db.playlistItems,
+    ).filter((f) => f.playlistId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_playlistItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PlaylistsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlaylistsTable> {
+  $$PlaylistsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> playlistItemsRefs(
+    Expression<bool> Function($$PlaylistItemsTableFilterComposer f) f,
+  ) {
+    final $$PlaylistItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.playlistItems,
+      getReferencedColumn: (t) => t.playlistId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.playlistItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PlaylistsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlaylistsTable> {
+  $$PlaylistsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlaylistsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlaylistsTable> {
+  $$PlaylistsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> playlistItemsRefs<T extends Object>(
+    Expression<T> Function($$PlaylistItemsTableAnnotationComposer a) f,
+  ) {
+    final $$PlaylistItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.playlistItems,
+      getReferencedColumn: (t) => t.playlistId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.playlistItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PlaylistsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlaylistsTable,
+          Playlist,
+          $$PlaylistsTableFilterComposer,
+          $$PlaylistsTableOrderingComposer,
+          $$PlaylistsTableAnnotationComposer,
+          $$PlaylistsTableCreateCompanionBuilder,
+          $$PlaylistsTableUpdateCompanionBuilder,
+          (Playlist, $$PlaylistsTableReferences),
+          Playlist,
+          PrefetchHooks Function({bool playlistItemsRefs})
+        > {
+  $$PlaylistsTableTableManager(_$AppDatabase db, $PlaylistsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaylistsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaylistsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaylistsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => PlaylistsCompanion(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => PlaylistsCompanion.insert(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlaylistsTable, Playlist>(table),
+                  $$PlaylistsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({playlistItemsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (playlistItemsRefs) db.playlistItems,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (playlistItemsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      Playlist,
+                      $PlaylistsTable,
+                      PlaylistItem,
+                      $PlaylistItemsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PlaylistsTableReferences
+                          ._playlistItemsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$PlaylistsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).playlistItemsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'playlist_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlaylistsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlaylistsTable,
+      Playlist,
+      $$PlaylistsTableFilterComposer,
+      $$PlaylistsTableOrderingComposer,
+      $$PlaylistsTableAnnotationComposer,
+      $$PlaylistsTableCreateCompanionBuilder,
+      $$PlaylistsTableUpdateCompanionBuilder,
+      (Playlist, $$PlaylistsTableReferences),
+      Playlist,
+      PrefetchHooks Function({bool playlistItemsRefs})
+    >;
+typedef $$PlaylistItemsTableCreateCompanionBuilder =
+    PlaylistItemsCompanion Function({
+      Value<int> id,
+      required int playlistId,
+      required int videoId,
+      required int position,
+    });
+typedef $$PlaylistItemsTableUpdateCompanionBuilder =
+    PlaylistItemsCompanion Function({
+      Value<int> id,
+      Value<int> playlistId,
+      Value<int> videoId,
+      Value<int> position,
+    });
+
+final class $$PlaylistItemsTableReferences
+    extends BaseReferences<_$AppDatabase, $PlaylistItemsTable, PlaylistItem> {
+  $$PlaylistItemsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PlaylistsTable _playlistIdTable(_$AppDatabase db) =>
+      db.playlists.createAlias('playlist_items__playlist_id__playlists__id');
+
+  $$PlaylistsTableProcessedTableManager get playlistId {
+    final $_column = $_itemColumn<int>('playlist_id')!;
+
+    final manager = $$PlaylistsTableTableManager(
+      $_db,
+      $_db.playlists,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_playlistIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $VideosTable _videoIdTable(_$AppDatabase db) =>
+      db.videos.createAlias('playlist_items__video_id__videos__id');
+
+  $$VideosTableProcessedTableManager get videoId {
+    final $_column = $_itemColumn<int>('video_id')!;
+
+    final manager = $$VideosTableTableManager(
+      $_db,
+      $_db.videos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_videoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PlaylistItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlaylistItemsTable> {
+  $$PlaylistItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlaylistsTableFilterComposer get playlistId {
+    final $$PlaylistsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playlistId,
+      referencedTable: $db.playlists,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistsTableFilterComposer(
+            $db: $db,
+            $table: $db.playlists,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableFilterComposer get videoId {
+    final $$VideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableFilterComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaylistItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlaylistItemsTable> {
+  $$PlaylistItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlaylistsTableOrderingComposer get playlistId {
+    final $$PlaylistsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playlistId,
+      referencedTable: $db.playlists,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistsTableOrderingComposer(
+            $db: $db,
+            $table: $db.playlists,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableOrderingComposer get videoId {
+    final $$VideosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableOrderingComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaylistItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlaylistItemsTable> {
+  $$PlaylistItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  $$PlaylistsTableAnnotationComposer get playlistId {
+    final $$PlaylistsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.playlistId,
+      referencedTable: $db.playlists,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlaylistsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.playlists,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableAnnotationComposer get videoId {
+    final $$VideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlaylistItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlaylistItemsTable,
+          PlaylistItem,
+          $$PlaylistItemsTableFilterComposer,
+          $$PlaylistItemsTableOrderingComposer,
+          $$PlaylistItemsTableAnnotationComposer,
+          $$PlaylistItemsTableCreateCompanionBuilder,
+          $$PlaylistItemsTableUpdateCompanionBuilder,
+          (PlaylistItem, $$PlaylistItemsTableReferences),
+          PlaylistItem,
+          PrefetchHooks Function({bool playlistId, bool videoId})
+        > {
+  $$PlaylistItemsTableTableManager(_$AppDatabase db, $PlaylistItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaylistItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaylistItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaylistItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> playlistId = const Value.absent(),
+                Value<int> videoId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+              }) => PlaylistItemsCompanion(
+                id: id,
+                playlistId: playlistId,
+                videoId: videoId,
+                position: position,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int playlistId,
+                required int videoId,
+                required int position,
+              }) => PlaylistItemsCompanion.insert(
+                id: id,
+                playlistId: playlistId,
+                videoId: videoId,
+                position: position,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlaylistItemsTable, PlaylistItem>(table),
+                  $$PlaylistItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({playlistId = false, videoId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2003,15 +4178,25 @@ class $$VideosTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (folderId) {
+                    if (playlistId) {
                       state = state.withJoin(
                         currentTable: table,
-                        currentColumn: table.folderId,
-                        referencedTable: $$VideosTableReferences._folderIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$VideosTableReferences
-                            ._folderIdTable(db)
+                        currentColumn: table.playlistId,
+                        referencedTable: $$PlaylistItemsTableReferences
+                            ._playlistIdTable(db),
+                        referencedColumn: $$PlaylistItemsTableReferences
+                            ._playlistIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (videoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.videoId,
+                        referencedTable: $$PlaylistItemsTableReferences
+                            ._videoIdTable(db),
+                        referencedColumn: $$PlaylistItemsTableReferences
+                            ._videoIdTable(db)
                             .id,
                       ) as T;
                     }
@@ -2027,19 +4212,772 @@ class $$VideosTableTableManager
       );
 }
 
-typedef $$VideosTableProcessedTableManager =
+typedef $$PlaylistItemsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $VideosTable,
-      Video,
-      $$VideosTableFilterComposer,
-      $$VideosTableOrderingComposer,
-      $$VideosTableAnnotationComposer,
-      $$VideosTableCreateCompanionBuilder,
-      $$VideosTableUpdateCompanionBuilder,
-      (Video, $$VideosTableReferences),
-      Video,
-      PrefetchHooks Function({bool folderId})
+      $PlaylistItemsTable,
+      PlaylistItem,
+      $$PlaylistItemsTableFilterComposer,
+      $$PlaylistItemsTableOrderingComposer,
+      $$PlaylistItemsTableAnnotationComposer,
+      $$PlaylistItemsTableCreateCompanionBuilder,
+      $$PlaylistItemsTableUpdateCompanionBuilder,
+      (PlaylistItem, $$PlaylistItemsTableReferences),
+      PlaylistItem,
+      PrefetchHooks Function({bool playlistId, bool videoId})
+    >;
+typedef $$CollectionsTableCreateCompanionBuilder =
+    CollectionsCompanion Function({
+      Value<int> id,
+      required String name,
+      required DateTime createdAt,
+      Value<int?> coverVideoId,
+    });
+typedef $$CollectionsTableUpdateCompanionBuilder =
+    CollectionsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<DateTime> createdAt,
+      Value<int?> coverVideoId,
+    });
+
+final class $$CollectionsTableReferences
+    extends BaseReferences<_$AppDatabase, $CollectionsTable, Collection> {
+  $$CollectionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VideosTable _coverVideoIdTable(_$AppDatabase db) =>
+      db.videos.createAlias('collections__cover_video_id__videos__id');
+
+  $$VideosTableProcessedTableManager? get coverVideoId {
+    final $_column = $_itemColumn<int>('cover_video_id');
+    if ($_column == null) return null;
+    final manager = $$VideosTableTableManager(
+      $_db,
+      $_db.videos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_coverVideoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$CollectionVideosTable, List<CollectionVideo>>
+  _collectionVideosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.collectionVideos,
+    aliasName: 'collections__id__collection_videos__collection_id',
+  );
+
+  $$CollectionVideosTableProcessedTableManager get collectionVideosRefs {
+    final manager = $$CollectionVideosTableTableManager(
+      $_db,
+      $_db.collectionVideos,
+    ).filter((f) => f.collectionId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _collectionVideosRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CollectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VideosTableFilterComposer get coverVideoId {
+    final $$VideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.coverVideoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableFilterComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> collectionVideosRefs(
+    Expression<bool> Function($$CollectionVideosTableFilterComposer f) f,
+  ) {
+    final $$CollectionVideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collectionVideos,
+      getReferencedColumn: (t) => t.collectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionVideosTableFilterComposer(
+            $db: $db,
+            $table: $db.collectionVideos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VideosTableOrderingComposer get coverVideoId {
+    final $$VideosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.coverVideoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableOrderingComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CollectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$VideosTableAnnotationComposer get coverVideoId {
+    final $$VideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.coverVideoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> collectionVideosRefs<T extends Object>(
+    Expression<T> Function($$CollectionVideosTableAnnotationComposer a) f,
+  ) {
+    final $$CollectionVideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.collectionVideos,
+      getReferencedColumn: (t) => t.collectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionVideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.collectionVideos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CollectionsTable,
+          Collection,
+          $$CollectionsTableFilterComposer,
+          $$CollectionsTableOrderingComposer,
+          $$CollectionsTableAnnotationComposer,
+          $$CollectionsTableCreateCompanionBuilder,
+          $$CollectionsTableUpdateCompanionBuilder,
+          (Collection, $$CollectionsTableReferences),
+          Collection,
+          PrefetchHooks Function({bool coverVideoId, bool collectionVideosRefs})
+        > {
+  $$CollectionsTableTableManager(_$AppDatabase db, $CollectionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CollectionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CollectionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CollectionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int?> coverVideoId = const Value.absent(),
+              }) => CollectionsCompanion(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                coverVideoId: coverVideoId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required DateTime createdAt,
+                Value<int?> coverVideoId = const Value.absent(),
+              }) => CollectionsCompanion.insert(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+                coverVideoId: coverVideoId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CollectionsTable, Collection>(table),
+                  $$CollectionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({coverVideoId = false, collectionVideosRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (collectionVideosRefs) db.collectionVideos,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (coverVideoId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.coverVideoId,
+                            referencedTable: $$CollectionsTableReferences
+                                ._coverVideoIdTable(db),
+                            referencedColumn: $$CollectionsTableReferences
+                                ._coverVideoIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (collectionVideosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Collection,
+                          $CollectionsTable,
+                          CollectionVideo,
+                          $CollectionVideosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CollectionsTableReferences
+                              ._collectionVideosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CollectionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).collectionVideosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'collection_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CollectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CollectionsTable,
+      Collection,
+      $$CollectionsTableFilterComposer,
+      $$CollectionsTableOrderingComposer,
+      $$CollectionsTableAnnotationComposer,
+      $$CollectionsTableCreateCompanionBuilder,
+      $$CollectionsTableUpdateCompanionBuilder,
+      (Collection, $$CollectionsTableReferences),
+      Collection,
+      PrefetchHooks Function({bool coverVideoId, bool collectionVideosRefs})
+    >;
+typedef $$CollectionVideosTableCreateCompanionBuilder =
+    CollectionVideosCompanion Function({
+      required int collectionId,
+      required int videoId,
+      required DateTime addedAt,
+      Value<int> rowid,
+    });
+typedef $$CollectionVideosTableUpdateCompanionBuilder =
+    CollectionVideosCompanion Function({
+      Value<int> collectionId,
+      Value<int> videoId,
+      Value<DateTime> addedAt,
+      Value<int> rowid,
+    });
+
+final class $$CollectionVideosTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CollectionVideosTable, CollectionVideo> {
+  $$CollectionVideosTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CollectionsTable _collectionIdTable(_$AppDatabase db) => db
+      .collections
+      .createAlias('collection_videos__collection_id__collections__id');
+
+  $$CollectionsTableProcessedTableManager get collectionId {
+    final $_column = $_itemColumn<int>('collection_id')!;
+
+    final manager = $$CollectionsTableTableManager(
+      $_db,
+      $_db.collections,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_collectionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $VideosTable _videoIdTable(_$AppDatabase db) =>
+      db.videos.createAlias('collection_videos__video_id__videos__id');
+
+  $$VideosTableProcessedTableManager get videoId {
+    final $_column = $_itemColumn<int>('video_id')!;
+
+    final manager = $$VideosTableTableManager(
+      $_db,
+      $_db.videos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_videoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CollectionVideosTableFilterComposer
+    extends Composer<_$AppDatabase, $CollectionVideosTable> {
+  $$CollectionVideosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CollectionsTableFilterComposer get collectionId {
+    final $$CollectionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionId,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableFilterComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableFilterComposer get videoId {
+    final $$VideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableFilterComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CollectionVideosTableOrderingComposer
+    extends Composer<_$AppDatabase, $CollectionVideosTable> {
+  $$CollectionVideosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CollectionsTableOrderingComposer get collectionId {
+    final $$CollectionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionId,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableOrderingComposer get videoId {
+    final $$VideosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableOrderingComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CollectionVideosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CollectionVideosTable> {
+  $$CollectionVideosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get addedAt =>
+      $composableBuilder(column: $table.addedAt, builder: (column) => column);
+
+  $$CollectionsTableAnnotationComposer get collectionId {
+    final $$CollectionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.collectionId,
+      referencedTable: $db.collections,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CollectionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.collections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VideosTableAnnotationComposer get videoId {
+    final $$VideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CollectionVideosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CollectionVideosTable,
+          CollectionVideo,
+          $$CollectionVideosTableFilterComposer,
+          $$CollectionVideosTableOrderingComposer,
+          $$CollectionVideosTableAnnotationComposer,
+          $$CollectionVideosTableCreateCompanionBuilder,
+          $$CollectionVideosTableUpdateCompanionBuilder,
+          (CollectionVideo, $$CollectionVideosTableReferences),
+          CollectionVideo,
+          PrefetchHooks Function({bool collectionId, bool videoId})
+        > {
+  $$CollectionVideosTableTableManager(
+    _$AppDatabase db,
+    $CollectionVideosTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CollectionVideosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CollectionVideosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CollectionVideosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> collectionId = const Value.absent(),
+                Value<int> videoId = const Value.absent(),
+                Value<DateTime> addedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CollectionVideosCompanion(
+                collectionId: collectionId,
+                videoId: videoId,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int collectionId,
+                required int videoId,
+                required DateTime addedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CollectionVideosCompanion.insert(
+                collectionId: collectionId,
+                videoId: videoId,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CollectionVideosTable, CollectionVideo>(table),
+                  $$CollectionVideosTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({collectionId = false, videoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (collectionId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.collectionId,
+                        referencedTable: $$CollectionVideosTableReferences
+                            ._collectionIdTable(db),
+                        referencedColumn: $$CollectionVideosTableReferences
+                            ._collectionIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (videoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.videoId,
+                        referencedTable: $$CollectionVideosTableReferences
+                            ._videoIdTable(db),
+                        referencedColumn: $$CollectionVideosTableReferences
+                            ._videoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CollectionVideosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CollectionVideosTable,
+      CollectionVideo,
+      $$CollectionVideosTableFilterComposer,
+      $$CollectionVideosTableOrderingComposer,
+      $$CollectionVideosTableAnnotationComposer,
+      $$CollectionVideosTableCreateCompanionBuilder,
+      $$CollectionVideosTableUpdateCompanionBuilder,
+      (CollectionVideo, $$CollectionVideosTableReferences),
+      CollectionVideo,
+      PrefetchHooks Function({bool collectionId, bool videoId})
     >;
 
 class $AppDatabaseManager {
@@ -2049,4 +4987,12 @@ class $AppDatabaseManager {
       $$LibraryFoldersTableTableManager(_db, _db.libraryFolders);
   $$VideosTableTableManager get videos =>
       $$VideosTableTableManager(_db, _db.videos);
+  $$PlaylistsTableTableManager get playlists =>
+      $$PlaylistsTableTableManager(_db, _db.playlists);
+  $$PlaylistItemsTableTableManager get playlistItems =>
+      $$PlaylistItemsTableTableManager(_db, _db.playlistItems);
+  $$CollectionsTableTableManager get collections =>
+      $$CollectionsTableTableManager(_db, _db.collections);
+  $$CollectionVideosTableTableManager get collectionVideos =>
+      $$CollectionVideosTableTableManager(_db, _db.collectionVideos);
 }

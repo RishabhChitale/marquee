@@ -31,12 +31,15 @@ class PlayerController {
     await player.open(Media(path, start: start));
   }
 
-  /// Queues [paths] in order and starts at [startPath].
+  /// Queues [paths] in order and starts at [startPath], or at [startIndex]
+  /// when given (needed when the same file appears twice in a playlist).
   Future<void> playList(List<String> paths, String startPath,
-      {Duration? start}) async {
-    queue.setItems(paths, start: paths.indexOf(startPath));
-    _opened.add(startPath);
-    await player.open(Media(startPath, start: start));
+      {Duration? start, int? startIndex}) async {
+    final i = startIndex ?? paths.indexOf(startPath);
+    queue.setItems(paths, start: i);
+    final path = paths.isEmpty ? startPath : paths[queue.index];
+    _opened.add(path);
+    await player.open(Media(path, start: start));
   }
 
   Future<void> play() => player.play();

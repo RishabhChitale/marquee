@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import 'core/library/library_providers.dart';
 import 'features/library/library_screen.dart';
+import 'features/lists/collection_detail_screen.dart';
+import 'features/lists/collections_screen.dart';
+import 'features/lists/playlist_detail_screen.dart';
+import 'features/lists/playlists_screen.dart';
 import 'features/player/player_screen.dart';
 import 'widgets/app_shell.dart';
 
@@ -17,6 +21,28 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: '/library',
           builder: (context, state) => const LibraryScreen(),
+        ),
+        GoRoute(
+          path: '/playlists',
+          builder: (context, state) => const PlaylistsScreen(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              builder: (context, state) => PlaylistDetailScreen(
+                  playlistId: int.parse(state.pathParameters['id']!)),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/collections',
+          builder: (context, state) => const CollectionsScreen(),
+          routes: [
+            GoRoute(
+              path: ':id',
+              builder: (context, state) => CollectionDetailScreen(
+                  collectionId: int.parse(state.pathParameters['id']!)),
+            ),
+          ],
         ),
         GoRoute(
           path: '/player',
