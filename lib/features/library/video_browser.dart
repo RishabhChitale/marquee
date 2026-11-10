@@ -15,7 +15,9 @@ import '../../core/player/time_format.dart';
 import '../../widgets/dialogs.dart';
 import '../../widgets/video_thumb.dart';
 import '../../core/library/tags_logic.dart';
+import '../../core/music/music_providers.dart';
 import '../lists/add_to_menu.dart';
+import 'music_ui.dart';
 import 'video_dialogs.dart';
 
 /// An extra entry in a card's right-click menu.
@@ -69,6 +71,7 @@ class _VideoBrowserState extends ConsumerState<VideoBrowser> {
   VideoSort _sort = VideoSort.newest;
   String? _genre;
   String? _person;
+  String? _music;
   Set<int> _selected = {};
   int? _anchor; // index into the visible list
 
@@ -115,10 +118,12 @@ class _VideoBrowserState extends ConsumerState<VideoBrowser> {
   @override
   Widget build(BuildContext context) {
     final idx = ref.watch(peopleIndexProvider);
+    final music = ref.watch(musicIndexProvider);
     final tagged = applyTagFilter(
       widget.videos,
       idx,
-      TagFilter(genre: _genre, personKey: _person),
+      TagFilter(genre: _genre, personKey: _person, musicKey: _music),
+      music: music,
     );
     final visible = filterAndSort(tagged, _query, _sort);
     final visibleIds = {for (final v in visible) v.id};
@@ -180,17 +185,39 @@ class _VideoBrowserState extends ConsumerState<VideoBrowser> {
                     ],
                   ),
                   ...?widget.actionsBuilder?.call(context, ref, visible),
+                  PopupMenuButton<String>(
+                    tooltip: 'More',
+                    onSelected: (v) {
+                      if (v == 'music') startMusicScan(context, ref, visible);
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: 'music',
+                        child: Text('Scan music'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
+            const MusicProgressBar(),
             if (widget.videos.isNotEmpty)
               _TagBar(
                 genres: genreCounts(widget.videos, idx, _person),
                 people: personCounts(widget.videos, idx, _genre),
+                musicTags: musicCounts(
+                  widget.videos,
+                  idx,
+                  music,
+                  _genre,
+                  _person,
+                ),
                 genre: _genre,
                 person: _person,
+                musicSel: _music,
                 onGenre: (g) => setState(() => _genre = g),
                 onPerson: (k) => setState(() => _person = k),
+                onMusic: (k) => setState(() => _music = k),
               ),
             Expanded(
               child: widget.videos.isEmpty && widget.empty != null
@@ -225,6 +252,10 @@ class _VideoBrowserState extends ConsumerState<VideoBrowser> {
                   pos,
                   _orderedSelection(visible),
                 ),
+                onMusic: () => startMusicScan(context, ref, [
+                  for (final v in visible)
+                    if (_selected.contains(v.id)) v,
+                ]),
                 onClear: _clear,
               ),
           ],
@@ -238,17 +269,23 @@ class _TagBar extends StatelessWidget {
   const _TagBar({
     required this.genres,
     required this.people,
+    required this.musicTags,
     required this.genre,
     required this.person,
+    required this.musicSel,
     required this.onGenre,
     required this.onPerson,
+    required this.onMusic,
   });
   final List<TagCount> genres;
   final List<TagCount> people;
+  final List<TagCount> musicTags;
   final String? genre;
   final String? person;
+  final String? musicSel;
   final ValueChanged<String?> onGenre;
   final ValueChanged<String?> onPerson;
+  final ValueChanged<String?> onMusic;
 
   List<TagCount> _withSelected(List<TagCount> l, String? sel) =>
       sel == null || l.any((c) => c.key == sel)
@@ -293,7 +330,8 @@ class _TagBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final g = _withSelected(genres, genre);
     final p = _withSelected(people, person);
-    if (g.isEmpty && p.isEmpty) return const SizedBox.shrink();
+    final mu = _withSelected(musicTags, musicSel);
+    if (g.isEmpty && p.isEmpty && mu.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
       child: Row(
@@ -303,14 +341,16 @@ class _TagBar extends StatelessWidget {
               children: [
                 _row('Genres', g, genre, onGenre),
                 _row('People', p, person, onPerson),
+                _row('Music', mu, musicSel, onMusic),
               ],
             ),
           ),
-          if (genre != null || person != null)
+          if (genre != null || person != null || musicSel != null)
             TextButton(
               onPressed: () {
                 onGenre(null);
                 onPerson(null);
+                onMusic(null);
               },
               child: const Text('Clear filters'),
             ),
@@ -325,11 +365,12 @@ class _ActionBar extends StatelessWidget {
     required this.count,
     required this.onPlaylist,
     required this.onCollection,
+    required this.onMusic,
     required this.onClear,
   });
   final int count;
   final void Function(Offset) onPlaylist, onCollection;
-  final VoidCallback onClear;
+  final VoidCallback onMusic, onClear;
 
   @override
   Widget build(BuildContext context) => Material(
@@ -358,6 +399,12 @@ class _ActionBar extends StatelessWidget {
               icon: const Icon(Icons.create_new_folder_outlined),
               label: const Text('Add to collection'),
             ),
+          ),
+          const SizedBox(width: 8),
+          TextButton.icon(
+            onPressed: onMusic,
+            icon: const Icon(Icons.music_note),
+            label: const Text('Scan music'),
           ),
           const SizedBox(width: 8),
           TextButton(onPressed: onClear, child: const Text('Clear')),
@@ -522,6 +569,11 @@ class _VideoCard extends ConsumerWidget {
         const PopupMenuItem(value: 'rename', child: Text('Rename')),
         const PopupMenuItem(value: 'people', child: Text('Edit people...')),
         const PopupMenuItem(value: 'details', child: Text('Details...')),
+        if (!video.missing)
+          const PopupMenuItem(
+            value: 'music',
+            child: Text('Recognize music'),
+          ),
         PopupMenuItem(
           value: 'show',
           child: Text(
@@ -563,6 +615,8 @@ class _VideoCard extends ConsumerWidget {
         await showEditPeople(context, ref, video);
       case 'details':
         await showDetails(context, ref, video);
+      case 'music':
+        await startMusicScan(context, ref, [video]);
       case 'show':
         if (Platform.isWindows) {
           await Process.run('explorer', ['/select,${video.path}']);
@@ -588,6 +642,9 @@ class _VideoCard extends ConsumerWidget {
     final frac = progressFraction(video);
     final accent = Theme.of(context).colorScheme.primary;
     final chips = chipSplit(collections);
+    final hasMusic = ref.watch(
+      musicIndexProvider.select((m) => m.containsKey(video.id)),
+    );
     final card = Opacity(
       opacity: video.missing ? 0.4 : 1,
       child: Column(
@@ -637,6 +694,23 @@ class _VideoCard extends ConsumerWidget {
                         child: LinearProgressIndicator(
                           value: frac,
                           minHeight: 3,
+                        ),
+                      ),
+                    if (hasMusic)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.black87,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.music_note,
+                            size: 14,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     if (selected)

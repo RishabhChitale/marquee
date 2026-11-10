@@ -9,6 +9,7 @@ import 'features/lists/collections_screen.dart';
 import 'features/lists/playlist_detail_screen.dart';
 import 'features/lists/playlists_screen.dart';
 import 'features/player/player_screen.dart';
+import 'features/settings/settings_screen.dart';
 import 'widgets/app_shell.dart';
 
 final GoRouter _router = GoRouter(
@@ -47,6 +48,10 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: '/player',
           builder: (context, state) => const PlayerScreen(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
         ),
       ],
     ),

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/db/database.dart';
 import '../../core/library/library_providers.dart';
 import '../../core/library/library_logic.dart';
 import '../../core/library/tags_logic.dart';
+import '../../core/music/music_providers.dart';
+import '../../core/player/player_controller.dart';
 import '../../core/player/time_format.dart';
 
 List<String> splitNames(String raw) => [
@@ -109,6 +112,24 @@ Future<void> showDetails(BuildContext context, WidgetRef ref, Video v) {
     ('Creator', creator.isEmpty ? '-' : creator.join(', ')),
     ('Featured', featured.isEmpty ? '-' : featured.join(', ')),
   ];
+  final matches = ref.read(matchesByVideoProvider)[v.id] ?? const [];
+  Future<void> playAt(BuildContext ctx, int offsetMs) async {
+    Navigator.pop(ctx);
+    if (v.missing) return;
+    await ref
+        .read(playerControllerProvider)
+        .open(v.path, start: Duration(milliseconds: offsetMs));
+    if (context.mounted) context.go('/player');
+  }
+
+  Widget copyBtn(String label, String? url) => url == null || url.isEmpty
+      ? const SizedBox.shrink()
+      : TextButton.icon(
+          onPressed: () => Clipboard.setData(ClipboardData(text: url)),
+          icon: const Icon(Icons.copy, size: 14),
+          label: Text('Copy $label link'),
+        );
+
   return showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -156,6 +177,38 @@ Future<void> showDetails(BuildContext context, WidgetRef ref, Video v) {
                     ),
                 ],
               ),
+              if (matches.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text('Music', style: Theme.of(ctx).textTheme.titleSmall),
+                for (final m in matches)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextButton(
+                          onPressed: () => playAt(ctx, m.offsetMs),
+                          child: Text(formatSeconds(m.offsetMs ~/ 1000)),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SelectableText('${m.artist} - ${m.title}'),
+                              Wrap(
+                                children: [
+                                  copyBtn('song', m.songLink),
+                                  copyBtn('Spotify', m.spotifyUrl),
+                                  copyBtn('Apple Music', m.appleMusicUrl),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ],
           ),
         ),

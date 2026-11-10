@@ -12,12 +12,28 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     const routes = ['/library', '/playlists', '/collections', '/player'];
     final found = routes.indexWhere(location.startsWith);
+    final onSettings = location.startsWith('/settings');
     final index = found < 0 ? 0 : found;
     return Scaffold(
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: index,
+            selectedIndex: onSettings ? null : index,
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: IconButton(
+                    tooltip: 'Settings',
+                    isSelected: onSettings,
+                    icon: const Icon(Icons.settings_outlined),
+                    selectedIcon: const Icon(Icons.settings),
+                    onPressed: () => context.go('/settings'),
+                  ),
+                ),
+              ),
+            ),
             labelType: NavigationRailLabelType.all,
             onDestinationSelected: (i) =>
                 context.go(routes[i]),

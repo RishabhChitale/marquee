@@ -112,6 +112,7 @@ void main() {
       peopleOverridden: false,
       titleOverridden: false,
       sourceChecked: false,
+      musicScanFailed: false,
     );
     final all = [v(1, 'Trips'), v(2, 'Trips'), v(3, 'Parties')];
     final idx = <int, List<PersonRef>>{

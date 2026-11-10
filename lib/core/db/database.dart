@@ -44,6 +44,25 @@ class Videos extends Table {
       boolean().withDefault(const Constant(false))();
   BoolColumn get sourceChecked =>
       boolean().withDefault(const Constant(false))();
+  DateTimeColumn get musicScannedAt => dateTime().nullable()();
+  BoolColumn get musicScanFailed =>
+      boolean().withDefault(const Constant(false))();
+}
+
+@DataClassName('MusicMatch')
+class MusicMatches extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get videoId =>
+      integer().references(Videos, #id, onDelete: KeyAction.cascade)();
+  IntColumn get offsetMs => integer()();
+  TextColumn get artist => text()();
+  TextColumn get title => text()();
+  TextColumn get album => text().nullable()();
+  TextColumn get releaseDate => text().nullable()();
+  TextColumn get songLink => text().nullable()();
+  TextColumn get spotifyUrl => text().nullable()();
+  TextColumn get appleMusicUrl => text().nullable()();
+  DateTimeColumn get matchedAt => dateTime()();
 }
 
 class People extends Table {
@@ -115,6 +134,7 @@ class CollectionVideos extends Table {
     CollectionVideos,
     People,
     VideoPeople,
+    MusicMatches,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -132,7 +152,7 @@ class AppDatabase extends _$AppDatabase {
   );
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -154,6 +174,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(people);
         await m.createTable(videoPeople);
       }
+      if (from < 4) {
+        await m.addColumn(videos, videos.musicScannedAt);
+        await m.addColumn(videos, videos.musicScanFailed);
+        await m.createTable(musicMatches);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -164,6 +189,26 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<VideoPeopleData>> watchVideoPeople() =>
       select(videoPeople).watch();
   Stream<List<PeopleData>> watchPeople() => select(people).watch();
+  Stream<List<MusicMatch>> watchMusicMatches() => select(musicMatches).watch();
+
+  /// Replaces all music matches of one video with [matches] (already
+  /// de-duplicated) and stamps the scan result. Never touches the file.
+  Future<void> saveMusicResult(
+    int videoId,
+    List<MusicMatchesCompanion> matches, {
+    required bool failed,
+  }) => transaction(() async {
+    await (delete(musicMatches)..where((t) => t.videoId.equals(videoId))).go();
+    for (final m in matches) {
+      await into(musicMatches).insert(m);
+    }
+    await (update(videos)..where((t) => t.id.equals(videoId))).write(
+      VideosCompanion(
+        musicScannedAt: Value(DateTime.now()),
+        musicScanFailed: Value(failed),
+      ),
+    );
+  });
 
   /// Replaces the people of one video (creator first, then featured).
   /// Names are de-duplicated by case-insensitive key; the first spelling seen

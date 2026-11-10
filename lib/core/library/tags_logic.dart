@@ -30,20 +30,48 @@ PeopleByVideo buildPeopleIndex(
 }
 
 class TagFilter {
-  const TagFilter({this.genre, this.personKey});
+  const TagFilter({this.genre, this.personKey, this.musicKey});
   final String? genre;
   final String? personKey;
-  bool get active => genre != null || personKey != null;
+
+  /// Song key (see songKey in music/dedupe.dart): lower-cased artist+title.
+  final String? musicKey;
+  bool get active => genre != null || personKey != null || musicKey != null;
 }
+
+/// videoId -> recognised songs (key + display label).
+typedef MusicByVideo = Map<int, Map<String, String>>;
+
+/// Builds videoId -> {songKey: "Artist - Title"} from the matches table.
+MusicByVideo buildMusicIndex(List<MusicMatch> matches) {
+  final out = <int, Map<String, String>>{};
+  for (final m in matches) {
+    final key = '${m.artist.trim().toLowerCase()}\u0000'
+        '${m.title.trim().toLowerCase()}';
+    (out[m.videoId] ??= {}).putIfAbsent(key, () => '${m.artist} - ${m.title}');
+  }
+  return out;
+}
+
+bool _musicOk(int id, MusicByVideo idx, String? key) =>
+    key == null || (idx[id]?.containsKey(key) ?? false);
 
 bool _genreOk(Video v, String? genre) => genre == null || v.genre == genre;
 bool _personOk(int id, PeopleByVideo idx, String? key) =>
     key == null || (idx[id]?.any((p) => p.key == key) ?? false);
 
-/// Genre AND person (either role).
-List<Video> applyTagFilter(List<Video> all, PeopleByVideo idx, TagFilter f) => [
+/// Genre AND person (either role) AND music.
+List<Video> applyTagFilter(
+  List<Video> all,
+  PeopleByVideo idx,
+  TagFilter f, {
+  MusicByVideo music = const {},
+}) => [
   for (final v in all)
-    if (_genreOk(v, f.genre) && _personOk(v.id, idx, f.personKey)) v,
+    if (_genreOk(v, f.genre) &&
+        _personOk(v.id, idx, f.personKey) &&
+        _musicOk(v.id, music, f.musicKey))
+      v,
 ];
 
 class TagCount {
@@ -82,6 +110,28 @@ List<TagCount> personCounts(List<Video> all, PeopleByVideo idx, String? genre) {
     for (final p in idx[v.id] ?? const <PersonRef>[]) {
       m[p.key] = (m[p.key] ?? 0) + 1;
       names.putIfAbsent(p.key, () => p.name);
+    }
+  }
+  return [for (final e in m.entries) TagCount(names[e.key]!, e.key, e.value)]
+    ..sort(_byCountThenName);
+}
+
+/// Music chips ("Artist - Title" + video count); counts respect the selected
+/// genre and person.
+List<TagCount> musicCounts(
+  List<Video> all,
+  PeopleByVideo idx,
+  MusicByVideo music,
+  String? genre,
+  String? personKey,
+) {
+  final m = <String, int>{};
+  final names = <String, String>{};
+  for (final v in all) {
+    if (!_genreOk(v, genre) || !_personOk(v.id, idx, personKey)) continue;
+    for (final e in (music[v.id] ?? const <String, String>{}).entries) {
+      m[e.key] = (m[e.key] ?? 0) + 1;
+      names.putIfAbsent(e.key, () => e.value);
     }
   }
   return [for (final e in m.entries) TagCount(names[e.key]!, e.key, e.value)]

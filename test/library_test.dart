@@ -36,6 +36,7 @@ Video vid({
       peopleOverridden: false,
       titleOverridden: false,
       sourceChecked: false,
+      musicScanFailed: false,
     );
 
 void main() {

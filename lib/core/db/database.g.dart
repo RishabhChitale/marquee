@@ -529,6 +529,33 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _musicScannedAtMeta = const VerificationMeta(
+    'musicScannedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> musicScannedAt =
+      GeneratedColumn<DateTime>(
+        'music_scanned_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _musicScanFailedMeta = const VerificationMeta(
+    'musicScanFailed',
+  );
+  @override
+  late final GeneratedColumn<bool> musicScanFailed = GeneratedColumn<bool>(
+    'music_scan_failed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("music_scan_failed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -554,6 +581,8 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
     peopleOverridden,
     titleOverridden,
     sourceChecked,
+    musicScannedAt,
+    musicScanFailed,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -740,6 +769,24 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
         ),
       );
     }
+    if (data.containsKey('music_scanned_at')) {
+      context.handle(
+        _musicScannedAtMeta,
+        musicScannedAt.isAcceptableOrUnknown(
+          data['music_scanned_at']!,
+          _musicScannedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('music_scan_failed')) {
+      context.handle(
+        _musicScanFailedMeta,
+        musicScanFailed.isAcceptableOrUnknown(
+          data['music_scan_failed']!,
+          _musicScanFailedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -841,6 +888,14 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
         DriftSqlType.bool,
         data['${effectivePrefix}source_checked'],
       )!,
+      musicScannedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}music_scanned_at'],
+      ),
+      musicScanFailed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}music_scan_failed'],
+      )!,
     );
   }
 
@@ -874,6 +929,8 @@ class Video extends DataClass implements Insertable<Video> {
   final bool peopleOverridden;
   final bool titleOverridden;
   final bool sourceChecked;
+  final DateTime? musicScannedAt;
+  final bool musicScanFailed;
   const Video({
     required this.id,
     required this.path,
@@ -898,6 +955,8 @@ class Video extends DataClass implements Insertable<Video> {
     required this.peopleOverridden,
     required this.titleOverridden,
     required this.sourceChecked,
+    this.musicScannedAt,
+    required this.musicScanFailed,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -937,6 +996,10 @@ class Video extends DataClass implements Insertable<Video> {
     map['people_overridden'] = Variable<bool>(peopleOverridden);
     map['title_overridden'] = Variable<bool>(titleOverridden);
     map['source_checked'] = Variable<bool>(sourceChecked);
+    if (!nullToAbsent || musicScannedAt != null) {
+      map['music_scanned_at'] = Variable<DateTime>(musicScannedAt);
+    }
+    map['music_scan_failed'] = Variable<bool>(musicScanFailed);
     return map;
   }
 
@@ -977,6 +1040,10 @@ class Video extends DataClass implements Insertable<Video> {
       peopleOverridden: Value(peopleOverridden),
       titleOverridden: Value(titleOverridden),
       sourceChecked: Value(sourceChecked),
+      musicScannedAt: musicScannedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(musicScannedAt),
+      musicScanFailed: Value(musicScanFailed),
     );
   }
 
@@ -1009,6 +1076,8 @@ class Video extends DataClass implements Insertable<Video> {
       peopleOverridden: serializer.fromJson<bool>(json['peopleOverridden']),
       titleOverridden: serializer.fromJson<bool>(json['titleOverridden']),
       sourceChecked: serializer.fromJson<bool>(json['sourceChecked']),
+      musicScannedAt: serializer.fromJson<DateTime?>(json['musicScannedAt']),
+      musicScanFailed: serializer.fromJson<bool>(json['musicScanFailed']),
     );
   }
   @override
@@ -1038,6 +1107,8 @@ class Video extends DataClass implements Insertable<Video> {
       'peopleOverridden': serializer.toJson<bool>(peopleOverridden),
       'titleOverridden': serializer.toJson<bool>(titleOverridden),
       'sourceChecked': serializer.toJson<bool>(sourceChecked),
+      'musicScannedAt': serializer.toJson<DateTime?>(musicScannedAt),
+      'musicScanFailed': serializer.toJson<bool>(musicScanFailed),
     };
   }
 
@@ -1065,6 +1136,8 @@ class Video extends DataClass implements Insertable<Video> {
     bool? peopleOverridden,
     bool? titleOverridden,
     bool? sourceChecked,
+    Value<DateTime?> musicScannedAt = const Value.absent(),
+    bool? musicScanFailed,
   }) => Video(
     id: id ?? this.id,
     path: path ?? this.path,
@@ -1091,6 +1164,10 @@ class Video extends DataClass implements Insertable<Video> {
     peopleOverridden: peopleOverridden ?? this.peopleOverridden,
     titleOverridden: titleOverridden ?? this.titleOverridden,
     sourceChecked: sourceChecked ?? this.sourceChecked,
+    musicScannedAt: musicScannedAt.present
+        ? musicScannedAt.value
+        : this.musicScannedAt,
+    musicScanFailed: musicScanFailed ?? this.musicScanFailed,
   );
   Video copyWithCompanion(VideosCompanion data) {
     return Video(
@@ -1137,6 +1214,12 @@ class Video extends DataClass implements Insertable<Video> {
       sourceChecked: data.sourceChecked.present
           ? data.sourceChecked.value
           : this.sourceChecked,
+      musicScannedAt: data.musicScannedAt.present
+          ? data.musicScannedAt.value
+          : this.musicScannedAt,
+      musicScanFailed: data.musicScanFailed.present
+          ? data.musicScanFailed.value
+          : this.musicScanFailed,
     );
   }
 
@@ -1165,7 +1248,9 @@ class Video extends DataClass implements Insertable<Video> {
           ..write('sourceDomain: $sourceDomain, ')
           ..write('peopleOverridden: $peopleOverridden, ')
           ..write('titleOverridden: $titleOverridden, ')
-          ..write('sourceChecked: $sourceChecked')
+          ..write('sourceChecked: $sourceChecked, ')
+          ..write('musicScannedAt: $musicScannedAt, ')
+          ..write('musicScanFailed: $musicScanFailed')
           ..write(')'))
         .toString();
   }
@@ -1195,6 +1280,8 @@ class Video extends DataClass implements Insertable<Video> {
     peopleOverridden,
     titleOverridden,
     sourceChecked,
+    musicScannedAt,
+    musicScanFailed,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1222,7 +1309,9 @@ class Video extends DataClass implements Insertable<Video> {
           other.sourceDomain == this.sourceDomain &&
           other.peopleOverridden == this.peopleOverridden &&
           other.titleOverridden == this.titleOverridden &&
-          other.sourceChecked == this.sourceChecked);
+          other.sourceChecked == this.sourceChecked &&
+          other.musicScannedAt == this.musicScannedAt &&
+          other.musicScanFailed == this.musicScanFailed);
 }
 
 class VideosCompanion extends UpdateCompanion<Video> {
@@ -1249,6 +1338,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
   final Value<bool> peopleOverridden;
   final Value<bool> titleOverridden;
   final Value<bool> sourceChecked;
+  final Value<DateTime?> musicScannedAt;
+  final Value<bool> musicScanFailed;
   const VideosCompanion({
     this.id = const Value.absent(),
     this.path = const Value.absent(),
@@ -1273,6 +1364,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.peopleOverridden = const Value.absent(),
     this.titleOverridden = const Value.absent(),
     this.sourceChecked = const Value.absent(),
+    this.musicScannedAt = const Value.absent(),
+    this.musicScanFailed = const Value.absent(),
   });
   VideosCompanion.insert({
     this.id = const Value.absent(),
@@ -1298,6 +1391,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.peopleOverridden = const Value.absent(),
     this.titleOverridden = const Value.absent(),
     this.sourceChecked = const Value.absent(),
+    this.musicScannedAt = const Value.absent(),
+    this.musicScanFailed = const Value.absent(),
   }) : path = Value(path),
        folderId = Value(folderId),
        fileName = Value(fileName),
@@ -1329,6 +1424,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
     Expression<bool>? peopleOverridden,
     Expression<bool>? titleOverridden,
     Expression<bool>? sourceChecked,
+    Expression<DateTime>? musicScannedAt,
+    Expression<bool>? musicScanFailed,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1354,6 +1451,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
       if (peopleOverridden != null) 'people_overridden': peopleOverridden,
       if (titleOverridden != null) 'title_overridden': titleOverridden,
       if (sourceChecked != null) 'source_checked': sourceChecked,
+      if (musicScannedAt != null) 'music_scanned_at': musicScannedAt,
+      if (musicScanFailed != null) 'music_scan_failed': musicScanFailed,
     });
   }
 
@@ -1381,6 +1480,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
     Value<bool>? peopleOverridden,
     Value<bool>? titleOverridden,
     Value<bool>? sourceChecked,
+    Value<DateTime?>? musicScannedAt,
+    Value<bool>? musicScanFailed,
   }) {
     return VideosCompanion(
       id: id ?? this.id,
@@ -1406,6 +1507,8 @@ class VideosCompanion extends UpdateCompanion<Video> {
       peopleOverridden: peopleOverridden ?? this.peopleOverridden,
       titleOverridden: titleOverridden ?? this.titleOverridden,
       sourceChecked: sourceChecked ?? this.sourceChecked,
+      musicScannedAt: musicScannedAt ?? this.musicScannedAt,
+      musicScanFailed: musicScanFailed ?? this.musicScanFailed,
     );
   }
 
@@ -1481,6 +1584,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
     if (sourceChecked.present) {
       map['source_checked'] = Variable<bool>(sourceChecked.value);
     }
+    if (musicScannedAt.present) {
+      map['music_scanned_at'] = Variable<DateTime>(musicScannedAt.value);
+    }
+    if (musicScanFailed.present) {
+      map['music_scan_failed'] = Variable<bool>(musicScanFailed.value);
+    }
     return map;
   }
 
@@ -1509,7 +1618,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
           ..write('sourceDomain: $sourceDomain, ')
           ..write('peopleOverridden: $peopleOverridden, ')
           ..write('titleOverridden: $titleOverridden, ')
-          ..write('sourceChecked: $sourceChecked')
+          ..write('sourceChecked: $sourceChecked, ')
+          ..write('musicScannedAt: $musicScannedAt, ')
+          ..write('musicScanFailed: $musicScanFailed')
           ..write(')'))
         .toString();
   }
@@ -3228,6 +3339,668 @@ class VideoPeopleCompanion extends UpdateCompanion<VideoPeopleData> {
   }
 }
 
+class $MusicMatchesTable extends MusicMatches
+    with TableInfo<$MusicMatchesTable, MusicMatch> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MusicMatchesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _videoIdMeta = const VerificationMeta(
+    'videoId',
+  );
+  @override
+  late final GeneratedColumn<int> videoId = GeneratedColumn<int>(
+    'video_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES videos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _offsetMsMeta = const VerificationMeta(
+    'offsetMs',
+  );
+  @override
+  late final GeneratedColumn<int> offsetMs = GeneratedColumn<int>(
+    'offset_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _artistMeta = const VerificationMeta('artist');
+  @override
+  late final GeneratedColumn<String> artist = GeneratedColumn<String>(
+    'artist',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _albumMeta = const VerificationMeta('album');
+  @override
+  late final GeneratedColumn<String> album = GeneratedColumn<String>(
+    'album',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _releaseDateMeta = const VerificationMeta(
+    'releaseDate',
+  );
+  @override
+  late final GeneratedColumn<String> releaseDate = GeneratedColumn<String>(
+    'release_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _songLinkMeta = const VerificationMeta(
+    'songLink',
+  );
+  @override
+  late final GeneratedColumn<String> songLink = GeneratedColumn<String>(
+    'song_link',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _spotifyUrlMeta = const VerificationMeta(
+    'spotifyUrl',
+  );
+  @override
+  late final GeneratedColumn<String> spotifyUrl = GeneratedColumn<String>(
+    'spotify_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _appleMusicUrlMeta = const VerificationMeta(
+    'appleMusicUrl',
+  );
+  @override
+  late final GeneratedColumn<String> appleMusicUrl = GeneratedColumn<String>(
+    'apple_music_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _matchedAtMeta = const VerificationMeta(
+    'matchedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> matchedAt = GeneratedColumn<DateTime>(
+    'matched_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    videoId,
+    offsetMs,
+    artist,
+    title,
+    album,
+    releaseDate,
+    songLink,
+    spotifyUrl,
+    appleMusicUrl,
+    matchedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'music_matches';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MusicMatch> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('video_id')) {
+      context.handle(
+        _videoIdMeta,
+        videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('offset_ms')) {
+      context.handle(
+        _offsetMsMeta,
+        offsetMs.isAcceptableOrUnknown(data['offset_ms']!, _offsetMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_offsetMsMeta);
+    }
+    if (data.containsKey('artist')) {
+      context.handle(
+        _artistMeta,
+        artist.isAcceptableOrUnknown(data['artist']!, _artistMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_artistMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('album')) {
+      context.handle(
+        _albumMeta,
+        album.isAcceptableOrUnknown(data['album']!, _albumMeta),
+      );
+    }
+    if (data.containsKey('release_date')) {
+      context.handle(
+        _releaseDateMeta,
+        releaseDate.isAcceptableOrUnknown(
+          data['release_date']!,
+          _releaseDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('song_link')) {
+      context.handle(
+        _songLinkMeta,
+        songLink.isAcceptableOrUnknown(data['song_link']!, _songLinkMeta),
+      );
+    }
+    if (data.containsKey('spotify_url')) {
+      context.handle(
+        _spotifyUrlMeta,
+        spotifyUrl.isAcceptableOrUnknown(data['spotify_url']!, _spotifyUrlMeta),
+      );
+    }
+    if (data.containsKey('apple_music_url')) {
+      context.handle(
+        _appleMusicUrlMeta,
+        appleMusicUrl.isAcceptableOrUnknown(
+          data['apple_music_url']!,
+          _appleMusicUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('matched_at')) {
+      context.handle(
+        _matchedAtMeta,
+        matchedAt.isAcceptableOrUnknown(data['matched_at']!, _matchedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_matchedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MusicMatch map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MusicMatch(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      videoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}video_id'],
+      )!,
+      offsetMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}offset_ms'],
+      )!,
+      artist: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}artist'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      album: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}album'],
+      ),
+      releaseDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}release_date'],
+      ),
+      songLink: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}song_link'],
+      ),
+      spotifyUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spotify_url'],
+      ),
+      appleMusicUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}apple_music_url'],
+      ),
+      matchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}matched_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MusicMatchesTable createAlias(String alias) {
+    return $MusicMatchesTable(attachedDatabase, alias);
+  }
+}
+
+class MusicMatch extends DataClass implements Insertable<MusicMatch> {
+  final int id;
+  final int videoId;
+  final int offsetMs;
+  final String artist;
+  final String title;
+  final String? album;
+  final String? releaseDate;
+  final String? songLink;
+  final String? spotifyUrl;
+  final String? appleMusicUrl;
+  final DateTime matchedAt;
+  const MusicMatch({
+    required this.id,
+    required this.videoId,
+    required this.offsetMs,
+    required this.artist,
+    required this.title,
+    this.album,
+    this.releaseDate,
+    this.songLink,
+    this.spotifyUrl,
+    this.appleMusicUrl,
+    required this.matchedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['video_id'] = Variable<int>(videoId);
+    map['offset_ms'] = Variable<int>(offsetMs);
+    map['artist'] = Variable<String>(artist);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || album != null) {
+      map['album'] = Variable<String>(album);
+    }
+    if (!nullToAbsent || releaseDate != null) {
+      map['release_date'] = Variable<String>(releaseDate);
+    }
+    if (!nullToAbsent || songLink != null) {
+      map['song_link'] = Variable<String>(songLink);
+    }
+    if (!nullToAbsent || spotifyUrl != null) {
+      map['spotify_url'] = Variable<String>(spotifyUrl);
+    }
+    if (!nullToAbsent || appleMusicUrl != null) {
+      map['apple_music_url'] = Variable<String>(appleMusicUrl);
+    }
+    map['matched_at'] = Variable<DateTime>(matchedAt);
+    return map;
+  }
+
+  MusicMatchesCompanion toCompanion(bool nullToAbsent) {
+    return MusicMatchesCompanion(
+      id: Value(id),
+      videoId: Value(videoId),
+      offsetMs: Value(offsetMs),
+      artist: Value(artist),
+      title: Value(title),
+      album: album == null && nullToAbsent
+          ? const Value.absent()
+          : Value(album),
+      releaseDate: releaseDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(releaseDate),
+      songLink: songLink == null && nullToAbsent
+          ? const Value.absent()
+          : Value(songLink),
+      spotifyUrl: spotifyUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(spotifyUrl),
+      appleMusicUrl: appleMusicUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appleMusicUrl),
+      matchedAt: Value(matchedAt),
+    );
+  }
+
+  factory MusicMatch.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MusicMatch(
+      id: serializer.fromJson<int>(json['id']),
+      videoId: serializer.fromJson<int>(json['videoId']),
+      offsetMs: serializer.fromJson<int>(json['offsetMs']),
+      artist: serializer.fromJson<String>(json['artist']),
+      title: serializer.fromJson<String>(json['title']),
+      album: serializer.fromJson<String?>(json['album']),
+      releaseDate: serializer.fromJson<String?>(json['releaseDate']),
+      songLink: serializer.fromJson<String?>(json['songLink']),
+      spotifyUrl: serializer.fromJson<String?>(json['spotifyUrl']),
+      appleMusicUrl: serializer.fromJson<String?>(json['appleMusicUrl']),
+      matchedAt: serializer.fromJson<DateTime>(json['matchedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'videoId': serializer.toJson<int>(videoId),
+      'offsetMs': serializer.toJson<int>(offsetMs),
+      'artist': serializer.toJson<String>(artist),
+      'title': serializer.toJson<String>(title),
+      'album': serializer.toJson<String?>(album),
+      'releaseDate': serializer.toJson<String?>(releaseDate),
+      'songLink': serializer.toJson<String?>(songLink),
+      'spotifyUrl': serializer.toJson<String?>(spotifyUrl),
+      'appleMusicUrl': serializer.toJson<String?>(appleMusicUrl),
+      'matchedAt': serializer.toJson<DateTime>(matchedAt),
+    };
+  }
+
+  MusicMatch copyWith({
+    int? id,
+    int? videoId,
+    int? offsetMs,
+    String? artist,
+    String? title,
+    Value<String?> album = const Value.absent(),
+    Value<String?> releaseDate = const Value.absent(),
+    Value<String?> songLink = const Value.absent(),
+    Value<String?> spotifyUrl = const Value.absent(),
+    Value<String?> appleMusicUrl = const Value.absent(),
+    DateTime? matchedAt,
+  }) => MusicMatch(
+    id: id ?? this.id,
+    videoId: videoId ?? this.videoId,
+    offsetMs: offsetMs ?? this.offsetMs,
+    artist: artist ?? this.artist,
+    title: title ?? this.title,
+    album: album.present ? album.value : this.album,
+    releaseDate: releaseDate.present ? releaseDate.value : this.releaseDate,
+    songLink: songLink.present ? songLink.value : this.songLink,
+    spotifyUrl: spotifyUrl.present ? spotifyUrl.value : this.spotifyUrl,
+    appleMusicUrl: appleMusicUrl.present
+        ? appleMusicUrl.value
+        : this.appleMusicUrl,
+    matchedAt: matchedAt ?? this.matchedAt,
+  );
+  MusicMatch copyWithCompanion(MusicMatchesCompanion data) {
+    return MusicMatch(
+      id: data.id.present ? data.id.value : this.id,
+      videoId: data.videoId.present ? data.videoId.value : this.videoId,
+      offsetMs: data.offsetMs.present ? data.offsetMs.value : this.offsetMs,
+      artist: data.artist.present ? data.artist.value : this.artist,
+      title: data.title.present ? data.title.value : this.title,
+      album: data.album.present ? data.album.value : this.album,
+      releaseDate: data.releaseDate.present
+          ? data.releaseDate.value
+          : this.releaseDate,
+      songLink: data.songLink.present ? data.songLink.value : this.songLink,
+      spotifyUrl: data.spotifyUrl.present
+          ? data.spotifyUrl.value
+          : this.spotifyUrl,
+      appleMusicUrl: data.appleMusicUrl.present
+          ? data.appleMusicUrl.value
+          : this.appleMusicUrl,
+      matchedAt: data.matchedAt.present ? data.matchedAt.value : this.matchedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MusicMatch(')
+          ..write('id: $id, ')
+          ..write('videoId: $videoId, ')
+          ..write('offsetMs: $offsetMs, ')
+          ..write('artist: $artist, ')
+          ..write('title: $title, ')
+          ..write('album: $album, ')
+          ..write('releaseDate: $releaseDate, ')
+          ..write('songLink: $songLink, ')
+          ..write('spotifyUrl: $spotifyUrl, ')
+          ..write('appleMusicUrl: $appleMusicUrl, ')
+          ..write('matchedAt: $matchedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    videoId,
+    offsetMs,
+    artist,
+    title,
+    album,
+    releaseDate,
+    songLink,
+    spotifyUrl,
+    appleMusicUrl,
+    matchedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MusicMatch &&
+          other.id == this.id &&
+          other.videoId == this.videoId &&
+          other.offsetMs == this.offsetMs &&
+          other.artist == this.artist &&
+          other.title == this.title &&
+          other.album == this.album &&
+          other.releaseDate == this.releaseDate &&
+          other.songLink == this.songLink &&
+          other.spotifyUrl == this.spotifyUrl &&
+          other.appleMusicUrl == this.appleMusicUrl &&
+          other.matchedAt == this.matchedAt);
+}
+
+class MusicMatchesCompanion extends UpdateCompanion<MusicMatch> {
+  final Value<int> id;
+  final Value<int> videoId;
+  final Value<int> offsetMs;
+  final Value<String> artist;
+  final Value<String> title;
+  final Value<String?> album;
+  final Value<String?> releaseDate;
+  final Value<String?> songLink;
+  final Value<String?> spotifyUrl;
+  final Value<String?> appleMusicUrl;
+  final Value<DateTime> matchedAt;
+  const MusicMatchesCompanion({
+    this.id = const Value.absent(),
+    this.videoId = const Value.absent(),
+    this.offsetMs = const Value.absent(),
+    this.artist = const Value.absent(),
+    this.title = const Value.absent(),
+    this.album = const Value.absent(),
+    this.releaseDate = const Value.absent(),
+    this.songLink = const Value.absent(),
+    this.spotifyUrl = const Value.absent(),
+    this.appleMusicUrl = const Value.absent(),
+    this.matchedAt = const Value.absent(),
+  });
+  MusicMatchesCompanion.insert({
+    this.id = const Value.absent(),
+    required int videoId,
+    required int offsetMs,
+    required String artist,
+    required String title,
+    this.album = const Value.absent(),
+    this.releaseDate = const Value.absent(),
+    this.songLink = const Value.absent(),
+    this.spotifyUrl = const Value.absent(),
+    this.appleMusicUrl = const Value.absent(),
+    required DateTime matchedAt,
+  }) : videoId = Value(videoId),
+       offsetMs = Value(offsetMs),
+       artist = Value(artist),
+       title = Value(title),
+       matchedAt = Value(matchedAt);
+  static Insertable<MusicMatch> custom({
+    Expression<int>? id,
+    Expression<int>? videoId,
+    Expression<int>? offsetMs,
+    Expression<String>? artist,
+    Expression<String>? title,
+    Expression<String>? album,
+    Expression<String>? releaseDate,
+    Expression<String>? songLink,
+    Expression<String>? spotifyUrl,
+    Expression<String>? appleMusicUrl,
+    Expression<DateTime>? matchedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (videoId != null) 'video_id': videoId,
+      if (offsetMs != null) 'offset_ms': offsetMs,
+      if (artist != null) 'artist': artist,
+      if (title != null) 'title': title,
+      if (album != null) 'album': album,
+      if (releaseDate != null) 'release_date': releaseDate,
+      if (songLink != null) 'song_link': songLink,
+      if (spotifyUrl != null) 'spotify_url': spotifyUrl,
+      if (appleMusicUrl != null) 'apple_music_url': appleMusicUrl,
+      if (matchedAt != null) 'matched_at': matchedAt,
+    });
+  }
+
+  MusicMatchesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? videoId,
+    Value<int>? offsetMs,
+    Value<String>? artist,
+    Value<String>? title,
+    Value<String?>? album,
+    Value<String?>? releaseDate,
+    Value<String?>? songLink,
+    Value<String?>? spotifyUrl,
+    Value<String?>? appleMusicUrl,
+    Value<DateTime>? matchedAt,
+  }) {
+    return MusicMatchesCompanion(
+      id: id ?? this.id,
+      videoId: videoId ?? this.videoId,
+      offsetMs: offsetMs ?? this.offsetMs,
+      artist: artist ?? this.artist,
+      title: title ?? this.title,
+      album: album ?? this.album,
+      releaseDate: releaseDate ?? this.releaseDate,
+      songLink: songLink ?? this.songLink,
+      spotifyUrl: spotifyUrl ?? this.spotifyUrl,
+      appleMusicUrl: appleMusicUrl ?? this.appleMusicUrl,
+      matchedAt: matchedAt ?? this.matchedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (videoId.present) {
+      map['video_id'] = Variable<int>(videoId.value);
+    }
+    if (offsetMs.present) {
+      map['offset_ms'] = Variable<int>(offsetMs.value);
+    }
+    if (artist.present) {
+      map['artist'] = Variable<String>(artist.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (album.present) {
+      map['album'] = Variable<String>(album.value);
+    }
+    if (releaseDate.present) {
+      map['release_date'] = Variable<String>(releaseDate.value);
+    }
+    if (songLink.present) {
+      map['song_link'] = Variable<String>(songLink.value);
+    }
+    if (spotifyUrl.present) {
+      map['spotify_url'] = Variable<String>(spotifyUrl.value);
+    }
+    if (appleMusicUrl.present) {
+      map['apple_music_url'] = Variable<String>(appleMusicUrl.value);
+    }
+    if (matchedAt.present) {
+      map['matched_at'] = Variable<DateTime>(matchedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MusicMatchesCompanion(')
+          ..write('id: $id, ')
+          ..write('videoId: $videoId, ')
+          ..write('offsetMs: $offsetMs, ')
+          ..write('artist: $artist, ')
+          ..write('title: $title, ')
+          ..write('album: $album, ')
+          ..write('releaseDate: $releaseDate, ')
+          ..write('songLink: $songLink, ')
+          ..write('spotifyUrl: $spotifyUrl, ')
+          ..write('appleMusicUrl: $appleMusicUrl, ')
+          ..write('matchedAt: $matchedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3241,6 +4014,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $PeopleTable people = $PeopleTable(this);
   late final $VideoPeopleTable videoPeople = $VideoPeopleTable(this);
+  late final $MusicMatchesTable musicMatches = $MusicMatchesTable(this);
   late final Index videosRecordedAt = Index(
     'videos_recorded_at',
     'CREATE INDEX videos_recorded_at ON videos (recorded_at)',
@@ -3262,6 +4036,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     collectionVideos,
     people,
     videoPeople,
+    musicMatches,
     videosRecordedAt,
     playlistItemsPos,
   ];
@@ -3322,6 +4097,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('video_people', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'videos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('music_matches', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -3610,6 +4392,8 @@ typedef $$VideosTableCreateCompanionBuilder = VideosCompanion Function({
   Value<bool> peopleOverridden,
   Value<bool> titleOverridden,
   Value<bool> sourceChecked,
+  Value<DateTime?> musicScannedAt,
+  Value<bool> musicScanFailed,
 });
 typedef $$VideosTableUpdateCompanionBuilder = VideosCompanion Function({
   Value<int> id,
@@ -3635,6 +4419,8 @@ typedef $$VideosTableUpdateCompanionBuilder = VideosCompanion Function({
   Value<bool> peopleOverridden,
   Value<bool> titleOverridden,
   Value<bool> sourceChecked,
+  Value<DateTime?> musicScannedAt,
+  Value<bool> musicScanFailed,
 });
 
 final class $$VideosTableReferences
@@ -3727,6 +4513,24 @@ final class $$VideosTableReferences
     ).filter((f) => f.videoId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_videoPeopleRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MusicMatchesTable, List<MusicMatch>>
+  _musicMatchesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.musicMatches,
+    aliasName: 'videos__id__music_matches__video_id',
+  );
+
+  $$MusicMatchesTableProcessedTableManager get musicMatchesRefs {
+    final manager = $$MusicMatchesTableTableManager(
+      $_db,
+      $_db.musicMatches,
+    ).filter((f) => f.videoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_musicMatchesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3852,6 +4656,16 @@ class $$VideosTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get musicScannedAt => $composableBuilder(
+    column: $table.musicScannedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get musicScanFailed => $composableBuilder(
+    column: $table.musicScanFailed,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$LibraryFoldersTableFilterComposer get folderId {
     final $$LibraryFoldersTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -3966,6 +4780,31 @@ class $$VideosTableFilterComposer
           }) => $$VideoPeopleTableFilterComposer(
             $db: $db,
             $table: $db.videoPeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> musicMatchesRefs(
+    Expression<bool> Function($$MusicMatchesTableFilterComposer f) f,
+  ) {
+    final $$MusicMatchesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.musicMatches,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MusicMatchesTableFilterComposer(
+            $db: $db,
+            $table: $db.musicMatches,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4095,6 +4934,16 @@ class $$VideosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get musicScannedAt => $composableBuilder(
+    column: $table.musicScannedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get musicScanFailed => $composableBuilder(
+    column: $table.musicScanFailed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$LibraryFoldersTableOrderingComposer get folderId {
     final $$LibraryFoldersTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4211,6 +5060,16 @@ class $$VideosTableAnnotationComposer
 
   GeneratedColumn<bool> get sourceChecked => $composableBuilder(
     column: $table.sourceChecked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get musicScannedAt => $composableBuilder(
+    column: $table.musicScannedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get musicScanFailed => $composableBuilder(
+    column: $table.musicScanFailed,
     builder: (column) => column,
   );
 
@@ -4336,6 +5195,31 @@ class $$VideosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> musicMatchesRefs<T extends Object>(
+    Expression<T> Function($$MusicMatchesTableAnnotationComposer a) f,
+  ) {
+    final $$MusicMatchesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.musicMatches,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MusicMatchesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.musicMatches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VideosTableTableManager
@@ -4357,6 +5241,7 @@ class $$VideosTableTableManager
             bool collectionsRefs,
             bool collectionVideosRefs,
             bool videoPeopleRefs,
+            bool musicMatchesRefs,
           })
         > {
   $$VideosTableTableManager(_$AppDatabase db, $VideosTable table)
@@ -4395,6 +5280,8 @@ class $$VideosTableTableManager
                 Value<bool> peopleOverridden = const Value.absent(),
                 Value<bool> titleOverridden = const Value.absent(),
                 Value<bool> sourceChecked = const Value.absent(),
+                Value<DateTime?> musicScannedAt = const Value.absent(),
+                Value<bool> musicScanFailed = const Value.absent(),
               }) => VideosCompanion(
                 id: id,
                 path: path,
@@ -4419,6 +5306,8 @@ class $$VideosTableTableManager
                 peopleOverridden: peopleOverridden,
                 titleOverridden: titleOverridden,
                 sourceChecked: sourceChecked,
+                musicScannedAt: musicScannedAt,
+                musicScanFailed: musicScanFailed,
               ),
           createCompanionCallback:
               ({
@@ -4445,6 +5334,8 @@ class $$VideosTableTableManager
                 Value<bool> peopleOverridden = const Value.absent(),
                 Value<bool> titleOverridden = const Value.absent(),
                 Value<bool> sourceChecked = const Value.absent(),
+                Value<DateTime?> musicScannedAt = const Value.absent(),
+                Value<bool> musicScanFailed = const Value.absent(),
               }) => VideosCompanion.insert(
                 id: id,
                 path: path,
@@ -4469,6 +5360,8 @@ class $$VideosTableTableManager
                 peopleOverridden: peopleOverridden,
                 titleOverridden: titleOverridden,
                 sourceChecked: sourceChecked,
+                musicScannedAt: musicScannedAt,
+                musicScanFailed: musicScanFailed,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4485,6 +5378,7 @@ class $$VideosTableTableManager
                 collectionsRefs = false,
                 collectionVideosRefs = false,
                 videoPeopleRefs = false,
+                musicMatchesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4493,6 +5387,7 @@ class $$VideosTableTableManager
                     if (collectionsRefs) db.collections,
                     if (collectionVideosRefs) db.collectionVideos,
                     if (videoPeopleRefs) db.videoPeople,
+                    if (musicMatchesRefs) db.musicMatches,
                   ],
                   addJoins:
                       <
@@ -4606,6 +5501,26 @@ class $$VideosTableTableManager
                           referencedColumn: 'video_id',
                           typedResults: items,
                         ),
+                      if (musicMatchesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Video,
+                          $VideosTable,
+                          MusicMatch,
+                          $MusicMatchesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VideosTableReferences
+                              ._musicMatchesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VideosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).musicMatchesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'video_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4632,6 +5547,7 @@ typedef $$VideosTableProcessedTableManager =
         bool collectionsRefs,
         bool collectionVideosRefs,
         bool videoPeopleRefs,
+        bool musicMatchesRefs,
       })
     >;
 typedef $$PlaylistsTableCreateCompanionBuilder = PlaylistsCompanion Function({
@@ -6648,6 +7564,435 @@ typedef $$VideoPeopleTableProcessedTableManager =
       VideoPeopleData,
       PrefetchHooks Function({bool videoId, bool personId})
     >;
+typedef $$MusicMatchesTableCreateCompanionBuilder =
+    MusicMatchesCompanion Function({
+      Value<int> id,
+      required int videoId,
+      required int offsetMs,
+      required String artist,
+      required String title,
+      Value<String?> album,
+      Value<String?> releaseDate,
+      Value<String?> songLink,
+      Value<String?> spotifyUrl,
+      Value<String?> appleMusicUrl,
+      required DateTime matchedAt,
+    });
+typedef $$MusicMatchesTableUpdateCompanionBuilder =
+    MusicMatchesCompanion Function({
+      Value<int> id,
+      Value<int> videoId,
+      Value<int> offsetMs,
+      Value<String> artist,
+      Value<String> title,
+      Value<String?> album,
+      Value<String?> releaseDate,
+      Value<String?> songLink,
+      Value<String?> spotifyUrl,
+      Value<String?> appleMusicUrl,
+      Value<DateTime> matchedAt,
+    });
+
+final class $$MusicMatchesTableReferences
+    extends BaseReferences<_$AppDatabase, $MusicMatchesTable, MusicMatch> {
+  $$MusicMatchesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VideosTable _videoIdTable(_$AppDatabase db) =>
+      db.videos.createAlias('music_matches__video_id__videos__id');
+
+  $$VideosTableProcessedTableManager get videoId {
+    final $_column = $_itemColumn<int>('video_id')!;
+
+    final manager = $$VideosTableTableManager(
+      $_db,
+      $_db.videos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_videoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MusicMatchesTableFilterComposer
+    extends Composer<_$AppDatabase, $MusicMatchesTable> {
+  $$MusicMatchesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get offsetMs => $composableBuilder(
+    column: $table.offsetMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get artist => $composableBuilder(
+    column: $table.artist,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get album => $composableBuilder(
+    column: $table.album,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get releaseDate => $composableBuilder(
+    column: $table.releaseDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get songLink => $composableBuilder(
+    column: $table.songLink,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spotifyUrl => $composableBuilder(
+    column: $table.spotifyUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appleMusicUrl => $composableBuilder(
+    column: $table.appleMusicUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get matchedAt => $composableBuilder(
+    column: $table.matchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VideosTableFilterComposer get videoId {
+    final $$VideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableFilterComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MusicMatchesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MusicMatchesTable> {
+  $$MusicMatchesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get offsetMs => $composableBuilder(
+    column: $table.offsetMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get artist => $composableBuilder(
+    column: $table.artist,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get album => $composableBuilder(
+    column: $table.album,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get releaseDate => $composableBuilder(
+    column: $table.releaseDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get songLink => $composableBuilder(
+    column: $table.songLink,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spotifyUrl => $composableBuilder(
+    column: $table.spotifyUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appleMusicUrl => $composableBuilder(
+    column: $table.appleMusicUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get matchedAt => $composableBuilder(
+    column: $table.matchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VideosTableOrderingComposer get videoId {
+    final $$VideosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableOrderingComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MusicMatchesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MusicMatchesTable> {
+  $$MusicMatchesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get offsetMs =>
+      $composableBuilder(column: $table.offsetMs, builder: (column) => column);
+
+  GeneratedColumn<String> get artist =>
+      $composableBuilder(column: $table.artist, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get album =>
+      $composableBuilder(column: $table.album, builder: (column) => column);
+
+  GeneratedColumn<String> get releaseDate => $composableBuilder(
+    column: $table.releaseDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get songLink =>
+      $composableBuilder(column: $table.songLink, builder: (column) => column);
+
+  GeneratedColumn<String> get spotifyUrl => $composableBuilder(
+    column: $table.spotifyUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appleMusicUrl => $composableBuilder(
+    column: $table.appleMusicUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get matchedAt =>
+      $composableBuilder(column: $table.matchedAt, builder: (column) => column);
+
+  $$VideosTableAnnotationComposer get videoId {
+    final $$VideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MusicMatchesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MusicMatchesTable,
+          MusicMatch,
+          $$MusicMatchesTableFilterComposer,
+          $$MusicMatchesTableOrderingComposer,
+          $$MusicMatchesTableAnnotationComposer,
+          $$MusicMatchesTableCreateCompanionBuilder,
+          $$MusicMatchesTableUpdateCompanionBuilder,
+          (MusicMatch, $$MusicMatchesTableReferences),
+          MusicMatch,
+          PrefetchHooks Function({bool videoId})
+        > {
+  $$MusicMatchesTableTableManager(_$AppDatabase db, $MusicMatchesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MusicMatchesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MusicMatchesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MusicMatchesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> videoId = const Value.absent(),
+                Value<int> offsetMs = const Value.absent(),
+                Value<String> artist = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> album = const Value.absent(),
+                Value<String?> releaseDate = const Value.absent(),
+                Value<String?> songLink = const Value.absent(),
+                Value<String?> spotifyUrl = const Value.absent(),
+                Value<String?> appleMusicUrl = const Value.absent(),
+                Value<DateTime> matchedAt = const Value.absent(),
+              }) => MusicMatchesCompanion(
+                id: id,
+                videoId: videoId,
+                offsetMs: offsetMs,
+                artist: artist,
+                title: title,
+                album: album,
+                releaseDate: releaseDate,
+                songLink: songLink,
+                spotifyUrl: spotifyUrl,
+                appleMusicUrl: appleMusicUrl,
+                matchedAt: matchedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int videoId,
+                required int offsetMs,
+                required String artist,
+                required String title,
+                Value<String?> album = const Value.absent(),
+                Value<String?> releaseDate = const Value.absent(),
+                Value<String?> songLink = const Value.absent(),
+                Value<String?> spotifyUrl = const Value.absent(),
+                Value<String?> appleMusicUrl = const Value.absent(),
+                required DateTime matchedAt,
+              }) => MusicMatchesCompanion.insert(
+                id: id,
+                videoId: videoId,
+                offsetMs: offsetMs,
+                artist: artist,
+                title: title,
+                album: album,
+                releaseDate: releaseDate,
+                songLink: songLink,
+                spotifyUrl: spotifyUrl,
+                appleMusicUrl: appleMusicUrl,
+                matchedAt: matchedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MusicMatchesTable, MusicMatch>(table),
+                  $$MusicMatchesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({videoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (videoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.videoId,
+                        referencedTable: $$MusicMatchesTableReferences
+                            ._videoIdTable(db),
+                        referencedColumn: $$MusicMatchesTableReferences
+                            ._videoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MusicMatchesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MusicMatchesTable,
+      MusicMatch,
+      $$MusicMatchesTableFilterComposer,
+      $$MusicMatchesTableOrderingComposer,
+      $$MusicMatchesTableAnnotationComposer,
+      $$MusicMatchesTableCreateCompanionBuilder,
+      $$MusicMatchesTableUpdateCompanionBuilder,
+      (MusicMatch, $$MusicMatchesTableReferences),
+      MusicMatch,
+      PrefetchHooks Function({bool videoId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6668,4 +8013,6 @@ class $AppDatabaseManager {
       $$PeopleTableTableManager(_db, _db.people);
   $$VideoPeopleTableTableManager get videoPeople =>
       $$VideoPeopleTableTableManager(_db, _db.videoPeople);
+  $$MusicMatchesTableTableManager get musicMatches =>
+      $$MusicMatchesTableTableManager(_db, _db.musicMatches);
 }
