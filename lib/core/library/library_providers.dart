@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../db/database.dart';
 import '../player/player_controller.dart';
+import '../shutdown.dart';
 import 'library_logic.dart';
 import 'scanner.dart';
 import 'thumbnailer.dart';
@@ -68,6 +69,12 @@ class LibraryService extends Notifier<ScanState> {
     final dir = await getApplicationSupportDirectory();
     _thumbs = Thumbnailer(_db, p.join(dir.path, 'thumbs'));
     ref.onDispose(() => _thumbs?.dispose());
+    AppShutdown.register(() async => _thumbs?.dispose(), first: true);
+    // Never thumbnail while the visible player is playing.
+    final player = ref.read(playerControllerProvider).player;
+    _thumbs!.gate.setPlaying(player.state.playing);
+    final sub = player.stream.playing.listen(_thumbs!.gate.setPlaying);
+    ref.onDispose(sub.cancel);
     await rescan();
   }
 

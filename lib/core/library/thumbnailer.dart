@@ -5,11 +5,13 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart' show VideoController;
+import 'package:media_kit_video/media_kit_video.dart'
+    show VideoController, VideoControllerConfiguration;
 import 'package:path/path.dart' as p;
 
 import '../db/database.dart';
 import 'library_logic.dart';
+import 'thumb_gate.dart';
 
 Uint8List _shrinkJpeg(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
@@ -22,9 +24,13 @@ Uint8List _shrinkJpeg(Uint8List bytes) {
 /// Generates thumbnails + metadata with a hidden, muted player, one file at a
 /// time. Failures leave thumbnail_path null and move on.
 class Thumbnailer {
-  Thumbnailer(this.db, this.thumbsDir);
+  Thumbnailer(this.db, this.thumbsDir, {ThumbGate? gate})
+      : gate = gate ?? ThumbGate();
   final AppDatabase db;
   final String thumbsDir;
+
+  /// Pauses work while the visible player is playing.
+  final ThumbGate gate;
 
   Player? _player;
   // ignore: unused_field
@@ -41,6 +47,12 @@ class Thumbnailer {
     try {
       await Directory(thumbsDir).create(recursive: true);
       while (!_disposed) {
+        if (!gate.allowed) {
+          // Free the hidden decoder while real playback runs.
+          await _closePlayer();
+          await gate.whenAllowed();
+          continue;
+        }
         final next = await (db.select(db.videos)
               ..where((t) =>
                   t.thumbnailPath.isNull() &
@@ -61,13 +73,32 @@ class Thumbnailer {
     }
   }
 
-  Player _ensurePlayer() {
+  Future<Player> _ensurePlayer() async {
     var pl = _player;
     if (pl == null) {
       pl = Player();
-      pl.setVolume(0);
-      _controller = VideoController(pl);
       _player = pl;
+      pl.setVolume(0);
+      final native = pl.platform;
+      if (native is NativePlayer) {
+        // Thumbnails need neither audio nor subtitles; keep decoding cheap.
+        for (final o in const {
+          'aid': 'no',
+          'sid': 'no',
+          'hwdec': 'auto-safe',
+        }.entries) {
+          try {
+            await native.setProperty(o.key, o.value);
+          } catch (_) {}
+        }
+      }
+      _controller = VideoController(
+        pl,
+        configuration: const VideoControllerConfiguration(
+          width: 480,
+          height: 270,
+        ),
+      );
     }
     return pl;
   }
@@ -76,12 +107,18 @@ class Thumbnailer {
     final pl = _player;
     _player = null;
     _controller = null;
-    await pl?.dispose();
+    if (pl == null) return;
+    try {
+      await pl.stop().timeout(const Duration(seconds: 2));
+    } catch (_) {}
+    try {
+      await pl.dispose().timeout(const Duration(seconds: 2));
+    } catch (_) {}
   }
 
   Future<bool> _one(Video v) async {
     if (!File(v.path).existsSync()) return false;
-    final pl = _ensurePlayer();
+    final pl = await _ensurePlayer();
     await pl.open(Media(v.path), play: false);
     await pl.stream.duration.firstWhere((d) => d > Duration.zero);
     await pl.stream.width.firstWhere((w) => w != null && w > 0);
@@ -132,6 +169,7 @@ class Thumbnailer {
 
   Future<void> dispose() async {
     _disposed = true;
+    gate.close();
     await _closePlayer();
   }
 }

@@ -4,13 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
+import '../shutdown.dart';
 import 'play_queue.dart';
 
 /// Wraps a media_kit [Player] with a simple play queue.
 class PlayerController {
   PlayerController() {
     player = Player();
-    video = VideoController(player);
+    // Hardware decode; texture size stays the video's own (no width/height).
+    final native = player.platform;
+    if (native is NativePlayer) {
+      unawaited(native.setProperty('hwdec', 'auto-safe'));
+    }
+    video = VideoController(
+      player,
+      configuration:
+          const VideoControllerConfiguration(enableHardwareAcceleration: true),
+    );
+    AppShutdown.register(dispose);
     player.stream.completed.listen((done) {
       if (done) next();
     });
@@ -86,7 +97,17 @@ class PlayerController {
   List<AudioTrack> get audioTracks => player.state.tracks.audio;
   List<SubtitleTrack> get subtitleTracks => player.state.tracks.subtitle;
 
-  Future<void> dispose() => player.dispose();
+  bool _disposed = false;
+
+  /// Stops, then disposes, the mpv instance. Safe to call twice.
+  Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
+    try {
+      await player.stop();
+    } catch (_) {}
+    await player.dispose();
+  }
 }
 
 final playerControllerProvider = Provider<PlayerController>((ref) {

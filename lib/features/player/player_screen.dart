@@ -11,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../../core/player/player_controller.dart';
 import '../../core/player/time_format.dart';
+import 'stats_overlay.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
   const PlayerScreen({super.key});
@@ -27,6 +28,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   bool _controlsVisible = true;
   bool _fullscreen = false;
   bool _hasMedia = false;
+  bool _showStats = false;
   double _preMuteVolume = 100;
 
   PlayerController get _c => ref.read(playerControllerProvider);
@@ -105,6 +107,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       if (_fullscreen) _setFullscreen(false);
     } else if (key == LogicalKeyboardKey.keyM) {
       _toggleMute();
+    } else if (key == LogicalKeyboardKey.keyI) {
+      setState(() => _showStats = !_showStats);
     } else {
       return KeyEventResult.ignored;
     }
@@ -135,6 +139,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     fit: StackFit.expand,
                     children: [
                       Video(controller: c.video, controls: NoVideoControls),
+                      if (_showStats)
+                        Positioned(
+                          left: 12,
+                          top: 12,
+                          child: StatsOverlay(player: c.player),
+                        ),
                       Positioned(
                         left: 0,
                         right: 0,
