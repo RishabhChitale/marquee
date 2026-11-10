@@ -30,6 +30,12 @@ Video vid({
       resumePositionMs: resumeMs,
       playCount: 0,
       missing: false,
+      genre: null,
+      sourceUrl: null,
+      sourceDomain: null,
+      peopleOverridden: false,
+      titleOverridden: false,
+      sourceChecked: false,
     );
 
 void main() {

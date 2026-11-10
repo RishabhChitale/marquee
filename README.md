@@ -1,7 +1,15 @@
 # Marquee
 
 A cross-platform (macOS + Windows) video player and library app.
-Milestone 1: the player (open/drag-drop, controls, shortcuts). The library arrives in milestone 2.
+A desktop player and library for your own home videos (macOS + Windows). Everything is local and offline: no network calls, no internet metadata. Video files are never modified or deleted ("Remove from library" only drops the database row).
+
+Smart organizing (milestone 4), all derived from local files:
+- Creator / featured people from file names such as `Beach day (Mom, Dad).mp4`, editable via right-click "Edit people..." (manual edits are never overwritten by rescans).
+- Genre from the top-level subfolder inside a library folder.
+- Genre and People tag bar with counts and a "Clear filters" button.
+- Download source (website) read from the browser's download attribute (`com.apple.metadata:kMDItemWhereFroms` on macOS via `/usr/bin/xattr` + `/usr/bin/plutil`, `Zone.Identifier` on Windows) and from container tags. Shown under "Details..." as copyable text; never opened automatically.
+
+**macOS sandbox is off.** This is a personal, unsigned app; the sandbox blocked re-reading saved library folders after relaunch and reading the download attribute.
 
 ## Stack
 

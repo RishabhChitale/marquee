@@ -9,7 +9,9 @@ import '../db/database.dart';
 import '../player/player_controller.dart';
 import '../shutdown.dart';
 import 'library_logic.dart';
+import 'name_parser.dart';
 import 'scanner.dart';
+import 'tags_logic.dart';
 import 'thumbnailer.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -19,10 +21,26 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 });
 
 final videosProvider = StreamProvider<List<Video>>(
-    (ref) => ref.watch(databaseProvider).watchVideos());
+  (ref) => ref.watch(databaseProvider).watchVideos(),
+);
+
+final peopleIndexProvider = Provider<PeopleByVideo>((ref) {
+  final people = ref.watch(_peopleProvider).value ?? const <PeopleData>[];
+  final links =
+      ref.watch(_videoPeopleProvider).value ?? const <VideoPeopleData>[];
+  return buildPeopleIndex(people, links);
+});
+
+final _peopleProvider = StreamProvider<List<PeopleData>>(
+  (ref) => ref.watch(databaseProvider).watchPeople(),
+);
+final _videoPeopleProvider = StreamProvider<List<VideoPeopleData>>(
+  (ref) => ref.watch(databaseProvider).watchVideoPeople(),
+);
 
 final foldersProvider = StreamProvider<List<LibraryFolder>>(
-    (ref) => ref.watch(databaseProvider).watchFolders());
+  (ref) => ref.watch(databaseProvider).watchFolders(),
+);
 
 class SearchQuery extends Notifier<String> {
   @override
@@ -30,8 +48,7 @@ class SearchQuery extends Notifier<String> {
   void set(String v) => state = v;
 }
 
-final searchProvider =
-    NotifierProvider<SearchQuery, String>(SearchQuery.new);
+final searchProvider = NotifierProvider<SearchQuery, String>(SearchQuery.new);
 
 class SortChoice extends Notifier<VideoSort> {
   @override
@@ -44,8 +61,7 @@ final sortProvider = NotifierProvider<SortChoice, VideoSort>(SortChoice.new);
 /// The videos currently visible (filtered + sorted).
 final visibleVideosProvider = Provider<List<Video>>((ref) {
   final all = ref.watch(videosProvider).value ?? const <Video>[];
-  return filterAndSort(
-      all, ref.watch(searchProvider), ref.watch(sortProvider));
+  return filterAndSort(all, ref.watch(searchProvider), ref.watch(sortProvider));
 });
 
 class ScanState {
@@ -82,8 +98,9 @@ class LibraryService extends Notifier<ScanState> {
     if (state.scanning) return;
     state = const ScanState(scanning: true);
     try {
-      await LibraryScanner(_db).scanAll(
-          onProgress: (n) => state = ScanState(scanning: true, found: n));
+      await LibraryScanner(
+        _db,
+      ).scanAll(onProgress: (n) => state = ScanState(scanning: true, found: n));
     } finally {
       state = ScanState(scanning: false, found: state.found);
     }
@@ -91,9 +108,12 @@ class LibraryService extends Notifier<ScanState> {
   }
 
   Future<void> addFolder(String path) async {
-    await _db.into(_db.libraryFolders).insert(
-        LibraryFoldersCompanion.insert(path: path, addedAt: DateTime.now()),
-        mode: InsertMode.insertOrIgnore);
+    await _db
+        .into(_db.libraryFolders)
+        .insert(
+          LibraryFoldersCompanion.insert(path: path, addedAt: DateTime.now()),
+          mode: InsertMode.insertOrIgnore,
+        );
     await rescan();
   }
 
@@ -105,8 +125,25 @@ class LibraryService extends Notifier<ScanState> {
   }
 
   Future<void> rename(int id, String title) async {
-    await (_db.update(_db.videos)..where((t) => t.id.equals(id)))
-        .write(VideosCompanion(title: Value(title)));
+    await (_db.update(_db.videos)..where((t) => t.id.equals(id))).write(
+      VideosCompanion(title: Value(title), titleOverridden: const Value(true)),
+    );
+  }
+
+  /// Manual people edit; protected from rescans.
+  Future<void> editPeople(int id, String? creator, List<String> featured) =>
+      _db.overridePeople(id, creator, featured);
+
+  /// Drops the manual override and re-derives people from the file name.
+  Future<void> resetPeople(int id) async {
+    final v = await (_db.select(
+      _db.videos,
+    )..where((t) => t.id.equals(id))).getSingle();
+    final parsed = parseName(p.basenameWithoutExtension(v.path));
+    await _db.setVideoPeople(id, parsed.creator, parsed.featured);
+    await (_db.update(_db.videos)..where((t) => t.id.equals(id))).write(
+      const VideosCompanion(peopleOverridden: Value(false)),
+    );
   }
 
   /// Removes only the database row.
@@ -115,8 +152,9 @@ class LibraryService extends Notifier<ScanState> {
   }
 }
 
-final libraryServiceProvider =
-    NotifierProvider<LibraryService, ScanState>(LibraryService.new);
+final libraryServiceProvider = NotifierProvider<LibraryService, ScanState>(
+  LibraryService.new,
+);
 
 /// Saves resume position / play count as the player runs.
 class PlaybackTracker {
@@ -124,12 +162,16 @@ class PlaybackTracker {
     _subs
       ..add(controller.opened.listen(_onOpened))
       ..add(controller.player.stream.position.listen(_onPosition))
-      ..add(controller.player.stream.playing.listen((playing) {
-        if (!playing) unawaited(save());
-      }))
-      ..add(controller.player.stream.completed.listen((done) {
-        if (done) unawaited(save(atEnd: true));
-      }));
+      ..add(
+        controller.player.stream.playing.listen((playing) {
+          if (!playing) unawaited(save());
+        }),
+      )
+      ..add(
+        controller.player.stream.completed.listen((done) {
+          if (done) unawaited(save(atEnd: true));
+        }),
+      );
   }
 
   final AppDatabase db;
@@ -141,14 +183,16 @@ class PlaybackTracker {
 
   Future<void> _onOpened(String path) async {
     await save(); // previous file
-    final v = await (db.select(db.videos)..where((t) => t.path.equals(path)))
-        .getSingleOrNull();
+    final v = await (db.select(
+      db.videos,
+    )..where((t) => t.path.equals(path))).getSingleOrNull();
     _videoId = v?.id;
     _counted = false;
     _lastSaveMs = DateTime.now().millisecondsSinceEpoch;
     if (v != null) {
-      await (db.update(db.videos)..where((t) => t.id.equals(v.id)))
-          .write(VideosCompanion(lastPlayedAt: Value(DateTime.now())));
+      await (db.update(db.videos)..where((t) => t.id.equals(v.id))).write(
+        VideosCompanion(lastPlayedAt: Value(DateTime.now())),
+      );
     }
   }
 
@@ -169,8 +213,9 @@ class PlaybackTracker {
     final finished = isFinished(pos, dur);
     final bump = finished && !_counted;
     if (finished) _counted = true;
-    final row = await (db.select(db.videos)..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (db.select(
+      db.videos,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) return;
     await (db.update(db.videos)..where((t) => t.id.equals(id))).write(
       VideosCompanion(
@@ -192,7 +237,9 @@ class PlaybackTracker {
 
 final playbackTrackerProvider = Provider<PlaybackTracker>((ref) {
   final t = PlaybackTracker(
-      ref.watch(databaseProvider), ref.watch(playerControllerProvider));
+    ref.watch(databaseProvider),
+    ref.watch(playerControllerProvider),
+  );
   ref.onDispose(t.dispose);
   return t;
 });

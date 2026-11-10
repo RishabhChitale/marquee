@@ -11,13 +11,15 @@ import 'package:path/path.dart' as p;
 
 import '../db/database.dart';
 import 'library_logic.dart';
+import 'source_detector.dart';
 import 'thumb_gate.dart';
 
 Uint8List _shrinkJpeg(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
   if (decoded == null) return bytes;
-  final resized =
-      decoded.width > 480 ? img.copyResize(decoded, width: 480) : decoded;
+  final resized = decoded.width > 480
+      ? img.copyResize(decoded, width: 480)
+      : decoded;
   return Uint8List.fromList(img.encodeJpg(resized, quality: 80));
 }
 
@@ -25,7 +27,7 @@ Uint8List _shrinkJpeg(Uint8List bytes) {
 /// time. Failures leave thumbnail_path null and move on.
 class Thumbnailer {
   Thumbnailer(this.db, this.thumbsDir, {ThumbGate? gate})
-      : gate = gate ?? ThumbGate();
+    : gate = gate ?? ThumbGate();
   final AppDatabase db;
   final String thumbsDir;
 
@@ -38,6 +40,7 @@ class Thumbnailer {
   bool _running = false;
   bool _disposed = false;
   final Set<int> _failed = {};
+  final Set<int> _sourceFailed = {};
 
   /// Kicks off processing of every video lacking a thumbnail. Safe to call
   /// repeatedly; only one loop runs at a time.
@@ -53,19 +56,41 @@ class Thumbnailer {
           await gate.whenAllowed();
           continue;
         }
-        final next = await (db.select(db.videos)
-              ..where((t) =>
-                  t.thumbnailPath.isNull() &
-                  t.missing.equals(false) &
-                  t.id.isNotIn(_failed))
-              ..orderBy([(t) => OrderingTerm.desc(t.addedAt)])
-              ..limit(1))
-            .getSingleOrNull();
-        if (next == null) break;
-        final ok = await _one(next)
+        final next =
+            await (db.select(db.videos)
+                  ..where(
+                    (t) =>
+                        t.thumbnailPath.isNull() &
+                        t.missing.equals(false) &
+                        t.id.isNotIn(_failed),
+                  )
+                  ..orderBy([(t) => OrderingTerm.desc(t.addedAt)])
+                  ..limit(1))
+                .getSingleOrNull();
+        if (next != null) {
+          final ok = await _one(next)
+              .timeout(const Duration(seconds: 10), onTimeout: () => false)
+              .catchError((_) => false);
+          if (!ok) _failed.add(next.id);
+          continue;
+        }
+        // Thumbnails done: backfill download-source info once per video.
+        final src =
+            await (db.select(db.videos)
+                  ..where(
+                    (t) =>
+                        t.sourceChecked.equals(false) &
+                        t.missing.equals(false) &
+                        t.id.isNotIn(_sourceFailed),
+                  )
+                  ..orderBy([(t) => OrderingTerm.desc(t.addedAt)])
+                  ..limit(1))
+                .getSingleOrNull();
+        if (src == null) break;
+        final ok = await _sourceOnly(src)
             .timeout(const Duration(seconds: 10), onTimeout: () => false)
             .catchError((_) => false);
-        if (!ok) _failed.add(next.id);
+        if (!ok) _sourceFailed.add(src.id);
       }
     } finally {
       _running = false;
@@ -116,6 +141,45 @@ class Thumbnailer {
     } catch (_) {}
   }
 
+  static const _tagKeys = [
+    'purl',
+    'comment',
+    'description',
+    'synopsis',
+    'url',
+    'website',
+  ];
+
+  /// URLs found in container tags of the currently open file (read-only).
+  Future<List<String>> _tagUrls(Player pl) async {
+    final native = pl.platform;
+    final vals = <String?>[];
+    if (native is NativePlayer) {
+      for (final k in _tagKeys) {
+        try {
+          vals.add(await native.getProperty('metadata/by-key/$k'));
+        } catch (_) {}
+      }
+    }
+    return urlsFromText(vals);
+  }
+
+  /// Source for a file that is not otherwise being opened: file attribute
+  /// first, container tags only when that finds nothing usable.
+  Future<bool> _sourceOnly(Video v) async {
+    if (!File(v.path).existsSync()) return false;
+    var found = pickSource(await readDownloadOrigin(v.path));
+    if (found == null || domainIsCdn(found.domain)) {
+      final pl = await _ensurePlayer();
+      await pl.open(Media(v.path), play: false);
+      await pl.stream.duration.firstWhere((d) => d > Duration.zero);
+      final viaTags = pickSource(await _tagUrls(pl));
+      if (viaTags != null) found = viaTags;
+    }
+    await db.setSource(v.id, found?.url, found?.domain);
+    return true;
+  }
+
   Future<bool> _one(Video v) async {
     if (!File(v.path).existsSync()) return false;
     final pl = await _ensurePlayer();
@@ -140,9 +204,15 @@ class Thumbnailer {
       }
     }
     recorded ??= v.fileModifiedAt;
+    final source = pickSource([
+      ...await readDownloadOrigin(v.path),
+      ...await _tagUrls(pl),
+    ]);
 
     var seekTo = Duration(milliseconds: (dur.inMilliseconds * 0.1).round());
-    if (seekTo < const Duration(seconds: 1)) seekTo = const Duration(seconds: 1);
+    if (seekTo < const Duration(seconds: 1)) {
+      seekTo = const Duration(seconds: 1);
+    }
     if (seekTo >= dur) seekTo = Duration.zero;
     await pl.seek(seekTo);
     await Future<void>.delayed(const Duration(milliseconds: 400));
@@ -162,6 +232,9 @@ class Thumbnailer {
         height: Value(h),
         recordedAt: Value(recorded),
         thumbnailPath: Value(thumbPath),
+        sourceUrl: Value(source?.url),
+        sourceDomain: Value(source?.domain),
+        sourceChecked: const Value(true),
       ),
     );
     return thumbPath != null;

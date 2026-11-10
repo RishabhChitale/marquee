@@ -453,6 +453,82 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _genreMeta = const VerificationMeta('genre');
+  @override
+  late final GeneratedColumn<String> genre = GeneratedColumn<String>(
+    'genre',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceUrlMeta = const VerificationMeta(
+    'sourceUrl',
+  );
+  @override
+  late final GeneratedColumn<String> sourceUrl = GeneratedColumn<String>(
+    'source_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceDomainMeta = const VerificationMeta(
+    'sourceDomain',
+  );
+  @override
+  late final GeneratedColumn<String> sourceDomain = GeneratedColumn<String>(
+    'source_domain',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _peopleOverriddenMeta = const VerificationMeta(
+    'peopleOverridden',
+  );
+  @override
+  late final GeneratedColumn<bool> peopleOverridden = GeneratedColumn<bool>(
+    'people_overridden',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("people_overridden" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _titleOverriddenMeta = const VerificationMeta(
+    'titleOverridden',
+  );
+  @override
+  late final GeneratedColumn<bool> titleOverridden = GeneratedColumn<bool>(
+    'title_overridden',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("title_overridden" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sourceCheckedMeta = const VerificationMeta(
+    'sourceChecked',
+  );
+  @override
+  late final GeneratedColumn<bool> sourceChecked = GeneratedColumn<bool>(
+    'source_checked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("source_checked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -472,6 +548,12 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
     resumePositionMs,
     playCount,
     missing,
+    genre,
+    sourceUrl,
+    sourceDomain,
+    peopleOverridden,
+    titleOverridden,
+    sourceChecked,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -610,6 +692,54 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
         missing.isAcceptableOrUnknown(data['missing']!, _missingMeta),
       );
     }
+    if (data.containsKey('genre')) {
+      context.handle(
+        _genreMeta,
+        genre.isAcceptableOrUnknown(data['genre']!, _genreMeta),
+      );
+    }
+    if (data.containsKey('source_url')) {
+      context.handle(
+        _sourceUrlMeta,
+        sourceUrl.isAcceptableOrUnknown(data['source_url']!, _sourceUrlMeta),
+      );
+    }
+    if (data.containsKey('source_domain')) {
+      context.handle(
+        _sourceDomainMeta,
+        sourceDomain.isAcceptableOrUnknown(
+          data['source_domain']!,
+          _sourceDomainMeta,
+        ),
+      );
+    }
+    if (data.containsKey('people_overridden')) {
+      context.handle(
+        _peopleOverriddenMeta,
+        peopleOverridden.isAcceptableOrUnknown(
+          data['people_overridden']!,
+          _peopleOverriddenMeta,
+        ),
+      );
+    }
+    if (data.containsKey('title_overridden')) {
+      context.handle(
+        _titleOverriddenMeta,
+        titleOverridden.isAcceptableOrUnknown(
+          data['title_overridden']!,
+          _titleOverriddenMeta,
+        ),
+      );
+    }
+    if (data.containsKey('source_checked')) {
+      context.handle(
+        _sourceCheckedMeta,
+        sourceChecked.isAcceptableOrUnknown(
+          data['source_checked']!,
+          _sourceCheckedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -687,6 +817,30 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
         DriftSqlType.bool,
         data['${effectivePrefix}missing'],
       )!,
+      genre: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}genre'],
+      ),
+      sourceUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_url'],
+      ),
+      sourceDomain: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_domain'],
+      ),
+      peopleOverridden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}people_overridden'],
+      )!,
+      titleOverridden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}title_overridden'],
+      )!,
+      sourceChecked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}source_checked'],
+      )!,
     );
   }
 
@@ -714,6 +868,12 @@ class Video extends DataClass implements Insertable<Video> {
   final int resumePositionMs;
   final int playCount;
   final bool missing;
+  final String? genre;
+  final String? sourceUrl;
+  final String? sourceDomain;
+  final bool peopleOverridden;
+  final bool titleOverridden;
+  final bool sourceChecked;
   const Video({
     required this.id,
     required this.path,
@@ -732,6 +892,12 @@ class Video extends DataClass implements Insertable<Video> {
     required this.resumePositionMs,
     required this.playCount,
     required this.missing,
+    this.genre,
+    this.sourceUrl,
+    this.sourceDomain,
+    required this.peopleOverridden,
+    required this.titleOverridden,
+    required this.sourceChecked,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -759,6 +925,18 @@ class Video extends DataClass implements Insertable<Video> {
     map['resume_position_ms'] = Variable<int>(resumePositionMs);
     map['play_count'] = Variable<int>(playCount);
     map['missing'] = Variable<bool>(missing);
+    if (!nullToAbsent || genre != null) {
+      map['genre'] = Variable<String>(genre);
+    }
+    if (!nullToAbsent || sourceUrl != null) {
+      map['source_url'] = Variable<String>(sourceUrl);
+    }
+    if (!nullToAbsent || sourceDomain != null) {
+      map['source_domain'] = Variable<String>(sourceDomain);
+    }
+    map['people_overridden'] = Variable<bool>(peopleOverridden);
+    map['title_overridden'] = Variable<bool>(titleOverridden);
+    map['source_checked'] = Variable<bool>(sourceChecked);
     return map;
   }
 
@@ -787,6 +965,18 @@ class Video extends DataClass implements Insertable<Video> {
       resumePositionMs: Value(resumePositionMs),
       playCount: Value(playCount),
       missing: Value(missing),
+      genre: genre == null && nullToAbsent
+          ? const Value.absent()
+          : Value(genre),
+      sourceUrl: sourceUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceUrl),
+      sourceDomain: sourceDomain == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceDomain),
+      peopleOverridden: Value(peopleOverridden),
+      titleOverridden: Value(titleOverridden),
+      sourceChecked: Value(sourceChecked),
     );
   }
 
@@ -813,6 +1003,12 @@ class Video extends DataClass implements Insertable<Video> {
       resumePositionMs: serializer.fromJson<int>(json['resumePositionMs']),
       playCount: serializer.fromJson<int>(json['playCount']),
       missing: serializer.fromJson<bool>(json['missing']),
+      genre: serializer.fromJson<String?>(json['genre']),
+      sourceUrl: serializer.fromJson<String?>(json['sourceUrl']),
+      sourceDomain: serializer.fromJson<String?>(json['sourceDomain']),
+      peopleOverridden: serializer.fromJson<bool>(json['peopleOverridden']),
+      titleOverridden: serializer.fromJson<bool>(json['titleOverridden']),
+      sourceChecked: serializer.fromJson<bool>(json['sourceChecked']),
     );
   }
   @override
@@ -836,6 +1032,12 @@ class Video extends DataClass implements Insertable<Video> {
       'resumePositionMs': serializer.toJson<int>(resumePositionMs),
       'playCount': serializer.toJson<int>(playCount),
       'missing': serializer.toJson<bool>(missing),
+      'genre': serializer.toJson<String?>(genre),
+      'sourceUrl': serializer.toJson<String?>(sourceUrl),
+      'sourceDomain': serializer.toJson<String?>(sourceDomain),
+      'peopleOverridden': serializer.toJson<bool>(peopleOverridden),
+      'titleOverridden': serializer.toJson<bool>(titleOverridden),
+      'sourceChecked': serializer.toJson<bool>(sourceChecked),
     };
   }
 
@@ -857,6 +1059,12 @@ class Video extends DataClass implements Insertable<Video> {
     int? resumePositionMs,
     int? playCount,
     bool? missing,
+    Value<String?> genre = const Value.absent(),
+    Value<String?> sourceUrl = const Value.absent(),
+    Value<String?> sourceDomain = const Value.absent(),
+    bool? peopleOverridden,
+    bool? titleOverridden,
+    bool? sourceChecked,
   }) => Video(
     id: id ?? this.id,
     path: path ?? this.path,
@@ -877,6 +1085,12 @@ class Video extends DataClass implements Insertable<Video> {
     resumePositionMs: resumePositionMs ?? this.resumePositionMs,
     playCount: playCount ?? this.playCount,
     missing: missing ?? this.missing,
+    genre: genre.present ? genre.value : this.genre,
+    sourceUrl: sourceUrl.present ? sourceUrl.value : this.sourceUrl,
+    sourceDomain: sourceDomain.present ? sourceDomain.value : this.sourceDomain,
+    peopleOverridden: peopleOverridden ?? this.peopleOverridden,
+    titleOverridden: titleOverridden ?? this.titleOverridden,
+    sourceChecked: sourceChecked ?? this.sourceChecked,
   );
   Video copyWithCompanion(VideosCompanion data) {
     return Video(
@@ -909,6 +1123,20 @@ class Video extends DataClass implements Insertable<Video> {
           : this.resumePositionMs,
       playCount: data.playCount.present ? data.playCount.value : this.playCount,
       missing: data.missing.present ? data.missing.value : this.missing,
+      genre: data.genre.present ? data.genre.value : this.genre,
+      sourceUrl: data.sourceUrl.present ? data.sourceUrl.value : this.sourceUrl,
+      sourceDomain: data.sourceDomain.present
+          ? data.sourceDomain.value
+          : this.sourceDomain,
+      peopleOverridden: data.peopleOverridden.present
+          ? data.peopleOverridden.value
+          : this.peopleOverridden,
+      titleOverridden: data.titleOverridden.present
+          ? data.titleOverridden.value
+          : this.titleOverridden,
+      sourceChecked: data.sourceChecked.present
+          ? data.sourceChecked.value
+          : this.sourceChecked,
     );
   }
 
@@ -931,13 +1159,19 @@ class Video extends DataClass implements Insertable<Video> {
           ..write('lastPlayedAt: $lastPlayedAt, ')
           ..write('resumePositionMs: $resumePositionMs, ')
           ..write('playCount: $playCount, ')
-          ..write('missing: $missing')
+          ..write('missing: $missing, ')
+          ..write('genre: $genre, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('sourceDomain: $sourceDomain, ')
+          ..write('peopleOverridden: $peopleOverridden, ')
+          ..write('titleOverridden: $titleOverridden, ')
+          ..write('sourceChecked: $sourceChecked')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     path,
     folderId,
@@ -955,7 +1189,13 @@ class Video extends DataClass implements Insertable<Video> {
     resumePositionMs,
     playCount,
     missing,
-  );
+    genre,
+    sourceUrl,
+    sourceDomain,
+    peopleOverridden,
+    titleOverridden,
+    sourceChecked,
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -976,7 +1216,13 @@ class Video extends DataClass implements Insertable<Video> {
           other.lastPlayedAt == this.lastPlayedAt &&
           other.resumePositionMs == this.resumePositionMs &&
           other.playCount == this.playCount &&
-          other.missing == this.missing);
+          other.missing == this.missing &&
+          other.genre == this.genre &&
+          other.sourceUrl == this.sourceUrl &&
+          other.sourceDomain == this.sourceDomain &&
+          other.peopleOverridden == this.peopleOverridden &&
+          other.titleOverridden == this.titleOverridden &&
+          other.sourceChecked == this.sourceChecked);
 }
 
 class VideosCompanion extends UpdateCompanion<Video> {
@@ -997,6 +1243,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
   final Value<int> resumePositionMs;
   final Value<int> playCount;
   final Value<bool> missing;
+  final Value<String?> genre;
+  final Value<String?> sourceUrl;
+  final Value<String?> sourceDomain;
+  final Value<bool> peopleOverridden;
+  final Value<bool> titleOverridden;
+  final Value<bool> sourceChecked;
   const VideosCompanion({
     this.id = const Value.absent(),
     this.path = const Value.absent(),
@@ -1015,6 +1267,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.resumePositionMs = const Value.absent(),
     this.playCount = const Value.absent(),
     this.missing = const Value.absent(),
+    this.genre = const Value.absent(),
+    this.sourceUrl = const Value.absent(),
+    this.sourceDomain = const Value.absent(),
+    this.peopleOverridden = const Value.absent(),
+    this.titleOverridden = const Value.absent(),
+    this.sourceChecked = const Value.absent(),
   });
   VideosCompanion.insert({
     this.id = const Value.absent(),
@@ -1034,6 +1292,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.resumePositionMs = const Value.absent(),
     this.playCount = const Value.absent(),
     this.missing = const Value.absent(),
+    this.genre = const Value.absent(),
+    this.sourceUrl = const Value.absent(),
+    this.sourceDomain = const Value.absent(),
+    this.peopleOverridden = const Value.absent(),
+    this.titleOverridden = const Value.absent(),
+    this.sourceChecked = const Value.absent(),
   }) : path = Value(path),
        folderId = Value(folderId),
        fileName = Value(fileName),
@@ -1059,6 +1323,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
     Expression<int>? resumePositionMs,
     Expression<int>? playCount,
     Expression<bool>? missing,
+    Expression<String>? genre,
+    Expression<String>? sourceUrl,
+    Expression<String>? sourceDomain,
+    Expression<bool>? peopleOverridden,
+    Expression<bool>? titleOverridden,
+    Expression<bool>? sourceChecked,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1078,6 +1348,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
       if (resumePositionMs != null) 'resume_position_ms': resumePositionMs,
       if (playCount != null) 'play_count': playCount,
       if (missing != null) 'missing': missing,
+      if (genre != null) 'genre': genre,
+      if (sourceUrl != null) 'source_url': sourceUrl,
+      if (sourceDomain != null) 'source_domain': sourceDomain,
+      if (peopleOverridden != null) 'people_overridden': peopleOverridden,
+      if (titleOverridden != null) 'title_overridden': titleOverridden,
+      if (sourceChecked != null) 'source_checked': sourceChecked,
     });
   }
 
@@ -1099,6 +1375,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
     Value<int>? resumePositionMs,
     Value<int>? playCount,
     Value<bool>? missing,
+    Value<String?>? genre,
+    Value<String?>? sourceUrl,
+    Value<String?>? sourceDomain,
+    Value<bool>? peopleOverridden,
+    Value<bool>? titleOverridden,
+    Value<bool>? sourceChecked,
   }) {
     return VideosCompanion(
       id: id ?? this.id,
@@ -1118,6 +1400,12 @@ class VideosCompanion extends UpdateCompanion<Video> {
       resumePositionMs: resumePositionMs ?? this.resumePositionMs,
       playCount: playCount ?? this.playCount,
       missing: missing ?? this.missing,
+      genre: genre ?? this.genre,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
+      sourceDomain: sourceDomain ?? this.sourceDomain,
+      peopleOverridden: peopleOverridden ?? this.peopleOverridden,
+      titleOverridden: titleOverridden ?? this.titleOverridden,
+      sourceChecked: sourceChecked ?? this.sourceChecked,
     );
   }
 
@@ -1175,6 +1463,24 @@ class VideosCompanion extends UpdateCompanion<Video> {
     if (missing.present) {
       map['missing'] = Variable<bool>(missing.value);
     }
+    if (genre.present) {
+      map['genre'] = Variable<String>(genre.value);
+    }
+    if (sourceUrl.present) {
+      map['source_url'] = Variable<String>(sourceUrl.value);
+    }
+    if (sourceDomain.present) {
+      map['source_domain'] = Variable<String>(sourceDomain.value);
+    }
+    if (peopleOverridden.present) {
+      map['people_overridden'] = Variable<bool>(peopleOverridden.value);
+    }
+    if (titleOverridden.present) {
+      map['title_overridden'] = Variable<bool>(titleOverridden.value);
+    }
+    if (sourceChecked.present) {
+      map['source_checked'] = Variable<bool>(sourceChecked.value);
+    }
     return map;
   }
 
@@ -1197,7 +1503,13 @@ class VideosCompanion extends UpdateCompanion<Video> {
           ..write('lastPlayedAt: $lastPlayedAt, ')
           ..write('resumePositionMs: $resumePositionMs, ')
           ..write('playCount: $playCount, ')
-          ..write('missing: $missing')
+          ..write('missing: $missing, ')
+          ..write('genre: $genre, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('sourceDomain: $sourceDomain, ')
+          ..write('peopleOverridden: $peopleOverridden, ')
+          ..write('titleOverridden: $titleOverridden, ')
+          ..write('sourceChecked: $sourceChecked')
           ..write(')'))
         .toString();
   }
@@ -2397,6 +2709,525 @@ class CollectionVideosCompanion extends UpdateCompanion<CollectionVideo> {
   }
 }
 
+class $PeopleTable extends People with TableInfo<$PeopleTable, PeopleData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PeopleTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameKeyMeta = const VerificationMeta(
+    'nameKey',
+  );
+  @override
+  late final GeneratedColumn<String> nameKey = GeneratedColumn<String>(
+    'name_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, nameKey];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'people';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PeopleData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('name_key')) {
+      context.handle(
+        _nameKeyMeta,
+        nameKey.isAcceptableOrUnknown(data['name_key']!, _nameKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameKeyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PeopleData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PeopleData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      nameKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_key'],
+      )!,
+    );
+  }
+
+  @override
+  $PeopleTable createAlias(String alias) {
+    return $PeopleTable(attachedDatabase, alias);
+  }
+}
+
+class PeopleData extends DataClass implements Insertable<PeopleData> {
+  final int id;
+  final String name;
+  final String nameKey;
+  const PeopleData({
+    required this.id,
+    required this.name,
+    required this.nameKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['name_key'] = Variable<String>(nameKey);
+    return map;
+  }
+
+  PeopleCompanion toCompanion(bool nullToAbsent) {
+    return PeopleCompanion(
+      id: Value(id),
+      name: Value(name),
+      nameKey: Value(nameKey),
+    );
+  }
+
+  factory PeopleData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PeopleData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      nameKey: serializer.fromJson<String>(json['nameKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'nameKey': serializer.toJson<String>(nameKey),
+    };
+  }
+
+  PeopleData copyWith({int? id, String? name, String? nameKey}) => PeopleData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    nameKey: nameKey ?? this.nameKey,
+  );
+  PeopleData copyWithCompanion(PeopleCompanion data) {
+    return PeopleData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      nameKey: data.nameKey.present ? data.nameKey.value : this.nameKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('nameKey: $nameKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, nameKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PeopleData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.nameKey == this.nameKey);
+}
+
+class PeopleCompanion extends UpdateCompanion<PeopleData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> nameKey;
+  const PeopleCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.nameKey = const Value.absent(),
+  });
+  PeopleCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String nameKey,
+  }) : name = Value(name),
+       nameKey = Value(nameKey);
+  static Insertable<PeopleData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? nameKey,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (nameKey != null) 'name_key': nameKey,
+    });
+  }
+
+  PeopleCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? nameKey,
+  }) {
+    return PeopleCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      nameKey: nameKey ?? this.nameKey,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (nameKey.present) {
+      map['name_key'] = Variable<String>(nameKey.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PeopleCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('nameKey: $nameKey')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VideoPeopleTable extends VideoPeople
+    with TableInfo<$VideoPeopleTable, VideoPeopleData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VideoPeopleTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _videoIdMeta = const VerificationMeta(
+    'videoId',
+  );
+  @override
+  late final GeneratedColumn<int> videoId = GeneratedColumn<int>(
+    'video_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES videos (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<int> personId = GeneratedColumn<int>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES people (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (role IN (\'creator\', \'featured\'))',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [videoId, personId, role];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'video_people';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VideoPeopleData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('video_id')) {
+      context.handle(
+        _videoIdMeta,
+        videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_roleMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {videoId, personId};
+  @override
+  VideoPeopleData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VideoPeopleData(
+      videoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}video_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}person_id'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      )!,
+    );
+  }
+
+  @override
+  $VideoPeopleTable createAlias(String alias) {
+    return $VideoPeopleTable(attachedDatabase, alias);
+  }
+}
+
+class VideoPeopleData extends DataClass implements Insertable<VideoPeopleData> {
+  final int videoId;
+  final int personId;
+  final String role;
+  const VideoPeopleData({
+    required this.videoId,
+    required this.personId,
+    required this.role,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['video_id'] = Variable<int>(videoId);
+    map['person_id'] = Variable<int>(personId);
+    map['role'] = Variable<String>(role);
+    return map;
+  }
+
+  VideoPeopleCompanion toCompanion(bool nullToAbsent) {
+    return VideoPeopleCompanion(
+      videoId: Value(videoId),
+      personId: Value(personId),
+      role: Value(role),
+    );
+  }
+
+  factory VideoPeopleData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VideoPeopleData(
+      videoId: serializer.fromJson<int>(json['videoId']),
+      personId: serializer.fromJson<int>(json['personId']),
+      role: serializer.fromJson<String>(json['role']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'videoId': serializer.toJson<int>(videoId),
+      'personId': serializer.toJson<int>(personId),
+      'role': serializer.toJson<String>(role),
+    };
+  }
+
+  VideoPeopleData copyWith({int? videoId, int? personId, String? role}) =>
+      VideoPeopleData(
+        videoId: videoId ?? this.videoId,
+        personId: personId ?? this.personId,
+        role: role ?? this.role,
+      );
+  VideoPeopleData copyWithCompanion(VideoPeopleCompanion data) {
+    return VideoPeopleData(
+      videoId: data.videoId.present ? data.videoId.value : this.videoId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      role: data.role.present ? data.role.value : this.role,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VideoPeopleData(')
+          ..write('videoId: $videoId, ')
+          ..write('personId: $personId, ')
+          ..write('role: $role')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(videoId, personId, role);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VideoPeopleData &&
+          other.videoId == this.videoId &&
+          other.personId == this.personId &&
+          other.role == this.role);
+}
+
+class VideoPeopleCompanion extends UpdateCompanion<VideoPeopleData> {
+  final Value<int> videoId;
+  final Value<int> personId;
+  final Value<String> role;
+  final Value<int> rowid;
+  const VideoPeopleCompanion({
+    this.videoId = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.role = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VideoPeopleCompanion.insert({
+    required int videoId,
+    required int personId,
+    required String role,
+    this.rowid = const Value.absent(),
+  }) : videoId = Value(videoId),
+       personId = Value(personId),
+       role = Value(role);
+  static Insertable<VideoPeopleData> custom({
+    Expression<int>? videoId,
+    Expression<int>? personId,
+    Expression<String>? role,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (videoId != null) 'video_id': videoId,
+      if (personId != null) 'person_id': personId,
+      if (role != null) 'role': role,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VideoPeopleCompanion copyWith({
+    Value<int>? videoId,
+    Value<int>? personId,
+    Value<String>? role,
+    Value<int>? rowid,
+  }) {
+    return VideoPeopleCompanion(
+      videoId: videoId ?? this.videoId,
+      personId: personId ?? this.personId,
+      role: role ?? this.role,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (videoId.present) {
+      map['video_id'] = Variable<int>(videoId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<int>(personId.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VideoPeopleCompanion(')
+          ..write('videoId: $videoId, ')
+          ..write('personId: $personId, ')
+          ..write('role: $role, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2408,6 +3239,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CollectionVideosTable collectionVideos = $CollectionVideosTable(
     this,
   );
+  late final $PeopleTable people = $PeopleTable(this);
+  late final $VideoPeopleTable videoPeople = $VideoPeopleTable(this);
   late final Index videosRecordedAt = Index(
     'videos_recorded_at',
     'CREATE INDEX videos_recorded_at ON videos (recorded_at)',
@@ -2427,6 +3260,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     playlistItems,
     collections,
     collectionVideos,
+    people,
+    videoPeople,
     videosRecordedAt,
     playlistItemsPos,
   ];
@@ -2473,6 +3308,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('collection_videos', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'videos',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('video_people', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'people',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('video_people', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2755,6 +3604,12 @@ typedef $$VideosTableCreateCompanionBuilder = VideosCompanion Function({
   Value<int> resumePositionMs,
   Value<int> playCount,
   Value<bool> missing,
+  Value<String?> genre,
+  Value<String?> sourceUrl,
+  Value<String?> sourceDomain,
+  Value<bool> peopleOverridden,
+  Value<bool> titleOverridden,
+  Value<bool> sourceChecked,
 });
 typedef $$VideosTableUpdateCompanionBuilder = VideosCompanion Function({
   Value<int> id,
@@ -2774,6 +3629,12 @@ typedef $$VideosTableUpdateCompanionBuilder = VideosCompanion Function({
   Value<int> resumePositionMs,
   Value<int> playCount,
   Value<bool> missing,
+  Value<String?> genre,
+  Value<String?> sourceUrl,
+  Value<String?> sourceDomain,
+  Value<bool> peopleOverridden,
+  Value<bool> titleOverridden,
+  Value<bool> sourceChecked,
 });
 
 final class $$VideosTableReferences
@@ -2848,6 +3709,24 @@ final class $$VideosTableReferences
     final cache = $_typedResult.readTableOrNull(
       _collectionVideosRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$VideoPeopleTable, List<VideoPeopleData>>
+  _videoPeopleRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.videoPeople,
+    aliasName: 'videos__id__video_people__video_id',
+  );
+
+  $$VideoPeopleTableProcessedTableManager get videoPeopleRefs {
+    final manager = $$VideoPeopleTableTableManager(
+      $_db,
+      $_db.videoPeople,
+    ).filter((f) => f.videoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_videoPeopleRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2940,6 +3819,36 @@ class $$VideosTableFilterComposer
 
   ColumnFilters<bool> get missing => $composableBuilder(
     column: $table.missing,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get genre => $composableBuilder(
+    column: $table.genre,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceUrl => $composableBuilder(
+    column: $table.sourceUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceDomain => $composableBuilder(
+    column: $table.sourceDomain,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get peopleOverridden => $composableBuilder(
+    column: $table.peopleOverridden,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get titleOverridden => $composableBuilder(
+    column: $table.titleOverridden,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get sourceChecked => $composableBuilder(
+    column: $table.sourceChecked,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3040,6 +3949,31 @@ class $$VideosTableFilterComposer
     );
     return f(composer);
   }
+
+  Expression<bool> videoPeopleRefs(
+    Expression<bool> Function($$VideoPeopleTableFilterComposer f) f,
+  ) {
+    final $$VideoPeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.videoPeople,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideoPeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.videoPeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VideosTableOrderingComposer
@@ -3128,6 +4062,36 @@ class $$VideosTableOrderingComposer
 
   ColumnOrderings<bool> get missing => $composableBuilder(
     column: $table.missing,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get genre => $composableBuilder(
+    column: $table.genre,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceUrl => $composableBuilder(
+    column: $table.sourceUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceDomain => $composableBuilder(
+    column: $table.sourceDomain,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get peopleOverridden => $composableBuilder(
+    column: $table.peopleOverridden,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get titleOverridden => $composableBuilder(
+    column: $table.titleOverridden,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get sourceChecked => $composableBuilder(
+    column: $table.sourceChecked,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3223,6 +4187,32 @@ class $$VideosTableAnnotationComposer
 
   GeneratedColumn<bool> get missing =>
       $composableBuilder(column: $table.missing, builder: (column) => column);
+
+  GeneratedColumn<String> get genre =>
+      $composableBuilder(column: $table.genre, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceUrl =>
+      $composableBuilder(column: $table.sourceUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceDomain => $composableBuilder(
+    column: $table.sourceDomain,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get peopleOverridden => $composableBuilder(
+    column: $table.peopleOverridden,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get titleOverridden => $composableBuilder(
+    column: $table.titleOverridden,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get sourceChecked => $composableBuilder(
+    column: $table.sourceChecked,
+    builder: (column) => column,
+  );
 
   $$LibraryFoldersTableAnnotationComposer get folderId {
     final $$LibraryFoldersTableAnnotationComposer composer = $composerBuilder(
@@ -3321,6 +4311,31 @@ class $$VideosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> videoPeopleRefs<T extends Object>(
+    Expression<T> Function($$VideoPeopleTableAnnotationComposer a) f,
+  ) {
+    final $$VideoPeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.videoPeople,
+      getReferencedColumn: (t) => t.videoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideoPeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videoPeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VideosTableTableManager
@@ -3341,6 +4356,7 @@ class $$VideosTableTableManager
             bool playlistItemsRefs,
             bool collectionsRefs,
             bool collectionVideosRefs,
+            bool videoPeopleRefs,
           })
         > {
   $$VideosTableTableManager(_$AppDatabase db, $VideosTable table)
@@ -3373,6 +4389,12 @@ class $$VideosTableTableManager
                 Value<int> resumePositionMs = const Value.absent(),
                 Value<int> playCount = const Value.absent(),
                 Value<bool> missing = const Value.absent(),
+                Value<String?> genre = const Value.absent(),
+                Value<String?> sourceUrl = const Value.absent(),
+                Value<String?> sourceDomain = const Value.absent(),
+                Value<bool> peopleOverridden = const Value.absent(),
+                Value<bool> titleOverridden = const Value.absent(),
+                Value<bool> sourceChecked = const Value.absent(),
               }) => VideosCompanion(
                 id: id,
                 path: path,
@@ -3391,6 +4413,12 @@ class $$VideosTableTableManager
                 resumePositionMs: resumePositionMs,
                 playCount: playCount,
                 missing: missing,
+                genre: genre,
+                sourceUrl: sourceUrl,
+                sourceDomain: sourceDomain,
+                peopleOverridden: peopleOverridden,
+                titleOverridden: titleOverridden,
+                sourceChecked: sourceChecked,
               ),
           createCompanionCallback:
               ({
@@ -3411,6 +4439,12 @@ class $$VideosTableTableManager
                 Value<int> resumePositionMs = const Value.absent(),
                 Value<int> playCount = const Value.absent(),
                 Value<bool> missing = const Value.absent(),
+                Value<String?> genre = const Value.absent(),
+                Value<String?> sourceUrl = const Value.absent(),
+                Value<String?> sourceDomain = const Value.absent(),
+                Value<bool> peopleOverridden = const Value.absent(),
+                Value<bool> titleOverridden = const Value.absent(),
+                Value<bool> sourceChecked = const Value.absent(),
               }) => VideosCompanion.insert(
                 id: id,
                 path: path,
@@ -3429,6 +4463,12 @@ class $$VideosTableTableManager
                 resumePositionMs: resumePositionMs,
                 playCount: playCount,
                 missing: missing,
+                genre: genre,
+                sourceUrl: sourceUrl,
+                sourceDomain: sourceDomain,
+                peopleOverridden: peopleOverridden,
+                titleOverridden: titleOverridden,
+                sourceChecked: sourceChecked,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -3444,6 +4484,7 @@ class $$VideosTableTableManager
                 playlistItemsRefs = false,
                 collectionsRefs = false,
                 collectionVideosRefs = false,
+                videoPeopleRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3451,6 +4492,7 @@ class $$VideosTableTableManager
                     if (playlistItemsRefs) db.playlistItems,
                     if (collectionsRefs) db.collections,
                     if (collectionVideosRefs) db.collectionVideos,
+                    if (videoPeopleRefs) db.videoPeople,
                   ],
                   addJoins:
                       <
@@ -3544,6 +4586,26 @@ class $$VideosTableTableManager
                           referencedColumn: 'video_id',
                           typedResults: items,
                         ),
+                      if (videoPeopleRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Video,
+                          $VideosTable,
+                          VideoPeopleData,
+                          $VideoPeopleTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VideosTableReferences
+                              ._videoPeopleRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VideosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).videoPeopleRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'video_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3569,6 +4631,7 @@ typedef $$VideosTableProcessedTableManager =
         bool playlistItemsRefs,
         bool collectionsRefs,
         bool collectionVideosRefs,
+        bool videoPeopleRefs,
       })
     >;
 typedef $$PlaylistsTableCreateCompanionBuilder = PlaylistsCompanion Function({
@@ -4979,6 +6042,612 @@ typedef $$CollectionVideosTableProcessedTableManager =
       CollectionVideo,
       PrefetchHooks Function({bool collectionId, bool videoId})
     >;
+typedef $$PeopleTableCreateCompanionBuilder = PeopleCompanion Function({
+  Value<int> id,
+  required String name,
+  required String nameKey,
+});
+typedef $$PeopleTableUpdateCompanionBuilder = PeopleCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<String> nameKey,
+});
+
+final class $$PeopleTableReferences
+    extends BaseReferences<_$AppDatabase, $PeopleTable, PeopleData> {
+  $$PeopleTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$VideoPeopleTable, List<VideoPeopleData>>
+  _videoPeopleRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.videoPeople,
+    aliasName: 'people__id__video_people__person_id',
+  );
+
+  $$VideoPeopleTableProcessedTableManager get videoPeopleRefs {
+    final manager = $$VideoPeopleTableTableManager(
+      $_db,
+      $_db.videoPeople,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_videoPeopleRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PeopleTableFilterComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> videoPeopleRefs(
+    Expression<bool> Function($$VideoPeopleTableFilterComposer f) f,
+  ) {
+    final $$VideoPeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.videoPeople,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideoPeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.videoPeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PeopleTableOrderingComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PeopleTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PeopleTable> {
+  $$PeopleTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get nameKey =>
+      $composableBuilder(column: $table.nameKey, builder: (column) => column);
+
+  Expression<T> videoPeopleRefs<T extends Object>(
+    Expression<T> Function($$VideoPeopleTableAnnotationComposer a) f,
+  ) {
+    final $$VideoPeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.videoPeople,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideoPeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videoPeople,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PeopleTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PeopleTable,
+          PeopleData,
+          $$PeopleTableFilterComposer,
+          $$PeopleTableOrderingComposer,
+          $$PeopleTableAnnotationComposer,
+          $$PeopleTableCreateCompanionBuilder,
+          $$PeopleTableUpdateCompanionBuilder,
+          (PeopleData, $$PeopleTableReferences),
+          PeopleData,
+          PrefetchHooks Function({bool videoPeopleRefs})
+        > {
+  $$PeopleTableTableManager(_$AppDatabase db, $PeopleTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PeopleTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PeopleTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PeopleTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> nameKey = const Value.absent(),
+          }) => PeopleCompanion(id: id, name: name, nameKey: nameKey),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            required String nameKey,
+          }) => PeopleCompanion.insert(id: id, name: name, nameKey: nameKey),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PeopleTable, PeopleData>(table),
+                  $$PeopleTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({videoPeopleRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (videoPeopleRefs) db.videoPeople],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (videoPeopleRefs)
+                    await $_getPrefetchedDataByColumns<
+                      PeopleData,
+                      $PeopleTable,
+                      VideoPeopleData,
+                      $VideoPeopleTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PeopleTableReferences
+                          ._videoPeopleRefsTable(db),
+                      managerFromTypedResult: (p0) => $$PeopleTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).videoPeopleRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'person_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PeopleTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PeopleTable,
+      PeopleData,
+      $$PeopleTableFilterComposer,
+      $$PeopleTableOrderingComposer,
+      $$PeopleTableAnnotationComposer,
+      $$PeopleTableCreateCompanionBuilder,
+      $$PeopleTableUpdateCompanionBuilder,
+      (PeopleData, $$PeopleTableReferences),
+      PeopleData,
+      PrefetchHooks Function({bool videoPeopleRefs})
+    >;
+typedef $$VideoPeopleTableCreateCompanionBuilder =
+    VideoPeopleCompanion Function({
+      required int videoId,
+      required int personId,
+      required String role,
+      Value<int> rowid,
+    });
+typedef $$VideoPeopleTableUpdateCompanionBuilder =
+    VideoPeopleCompanion Function({
+      Value<int> videoId,
+      Value<int> personId,
+      Value<String> role,
+      Value<int> rowid,
+    });
+
+final class $$VideoPeopleTableReferences
+    extends BaseReferences<_$AppDatabase, $VideoPeopleTable, VideoPeopleData> {
+  $$VideoPeopleTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VideosTable _videoIdTable(_$AppDatabase db) =>
+      db.videos.createAlias('video_people__video_id__videos__id');
+
+  $$VideosTableProcessedTableManager get videoId {
+    final $_column = $_itemColumn<int>('video_id')!;
+
+    final manager = $$VideosTableTableManager(
+      $_db,
+      $_db.videos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_videoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PeopleTable _personIdTable(_$AppDatabase db) =>
+      db.people.createAlias('video_people__person_id__people__id');
+
+  $$PeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<int>('person_id')!;
+
+    final manager = $$PeopleTableTableManager(
+      $_db,
+      $_db.people,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$VideoPeopleTableFilterComposer
+    extends Composer<_$AppDatabase, $VideoPeopleTable> {
+  $$VideoPeopleTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VideosTableFilterComposer get videoId {
+    final $$VideosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableFilterComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableFilterComposer get personId {
+    final $$PeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VideoPeopleTableOrderingComposer
+    extends Composer<_$AppDatabase, $VideoPeopleTable> {
+  $$VideoPeopleTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VideosTableOrderingComposer get videoId {
+    final $$VideosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableOrderingComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableOrderingComposer get personId {
+    final $$PeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VideoPeopleTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VideoPeopleTable> {
+  $$VideoPeopleTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  $$VideosTableAnnotationComposer get videoId {
+    final $$VideosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.videoId,
+      referencedTable: $db.videos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VideosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.videos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableAnnotationComposer get personId {
+    final $$PeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VideoPeopleTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VideoPeopleTable,
+          VideoPeopleData,
+          $$VideoPeopleTableFilterComposer,
+          $$VideoPeopleTableOrderingComposer,
+          $$VideoPeopleTableAnnotationComposer,
+          $$VideoPeopleTableCreateCompanionBuilder,
+          $$VideoPeopleTableUpdateCompanionBuilder,
+          (VideoPeopleData, $$VideoPeopleTableReferences),
+          VideoPeopleData,
+          PrefetchHooks Function({bool videoId, bool personId})
+        > {
+  $$VideoPeopleTableTableManager(_$AppDatabase db, $VideoPeopleTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VideoPeopleTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VideoPeopleTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VideoPeopleTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> videoId = const Value.absent(),
+                Value<int> personId = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VideoPeopleCompanion(
+                videoId: videoId,
+                personId: personId,
+                role: role,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int videoId,
+                required int personId,
+                required String role,
+                Value<int> rowid = const Value.absent(),
+              }) => VideoPeopleCompanion.insert(
+                videoId: videoId,
+                personId: personId,
+                role: role,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$VideoPeopleTable, VideoPeopleData>(table),
+                  $$VideoPeopleTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({videoId = false, personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (videoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.videoId,
+                        referencedTable: $$VideoPeopleTableReferences
+                            ._videoIdTable(db),
+                        referencedColumn: $$VideoPeopleTableReferences
+                            ._videoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (personId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.personId,
+                        referencedTable: $$VideoPeopleTableReferences
+                            ._personIdTable(db),
+                        referencedColumn: $$VideoPeopleTableReferences
+                            ._personIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$VideoPeopleTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VideoPeopleTable,
+      VideoPeopleData,
+      $$VideoPeopleTableFilterComposer,
+      $$VideoPeopleTableOrderingComposer,
+      $$VideoPeopleTableAnnotationComposer,
+      $$VideoPeopleTableCreateCompanionBuilder,
+      $$VideoPeopleTableUpdateCompanionBuilder,
+      (VideoPeopleData, $$VideoPeopleTableReferences),
+      VideoPeopleData,
+      PrefetchHooks Function({bool videoId, bool personId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4995,4 +6664,8 @@ class $AppDatabaseManager {
       $$CollectionsTableTableManager(_db, _db.collections);
   $$CollectionVideosTableTableManager get collectionVideos =>
       $$CollectionVideosTableTableManager(_db, _db.collectionVideos);
+  $$PeopleTableTableManager get people =>
+      $$PeopleTableTableManager(_db, _db.people);
+  $$VideoPeopleTableTableManager get videoPeople =>
+      $$VideoPeopleTableTableManager(_db, _db.videoPeople);
 }
